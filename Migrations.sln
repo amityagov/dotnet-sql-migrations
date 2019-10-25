@@ -5,7 +5,12 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetMigrations", "DotnetMigrations\DotnetMigrations.csproj", "{B51E93C5-8026-4BBF-85DA-5AF4C663BB9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetMigrations.Lib", "DotnetMigrations.Lib\DotnetMigrations.Lib.csproj", "{3606B03C-FBC7-4C4C-88EF-F89641DEC151}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetMigrations.Lib", "DotnetMigrations.Lib\DotnetMigrations.Lib.csproj", "{3606B03C-FBC7-4C4C-88EF-F89641DEC151}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tools", ".tools", "{8863038C-57FB-4CB7-AAC6-1E15C06D9E07}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

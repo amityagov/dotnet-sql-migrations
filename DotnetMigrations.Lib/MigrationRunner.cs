@@ -48,9 +48,9 @@ namespace DotnetMigrations.Lib
 					var files = new List<MigrationInfo>();
 
 					connectionString = options.ConnectionString;
-					migrationsDirectory = options.MigrationsDirectory;
+					var migrationsDirectories = options.MigrationsDirectories;
 
-					if (ValidateFiles(migrationsDirectory, files))
+					if (ValidateDirectories(migrationsDirectories, files))
 					{
 						_executor.Execute(connectionString, files, arguments.DryRun);
 					}
@@ -68,9 +68,21 @@ namespace DotnetMigrations.Lib
 			}
 		}
 
+		private bool ValidateDirectories(ICollection<string> migrationsDirectories, IList<MigrationInfo> files)
+		{
+			bool success = true;
+
+			foreach (var directoryPath in migrationsDirectories)
+			{
+				success &= ValidateFiles(directoryPath, files);
+			}
+
+			return success;
+		}
+
 		private bool ValidateFiles(string directoryPath, IList<MigrationInfo> files)
 		{
-			_logger.LogInformation($"Use migrations directory: \"{directoryPath}\".");
+			_logger.LogInformation($"Validate migrations directory: \"{directoryPath}\".");
 
 			var directory = new DirectoryInfo(directoryPath);
 
@@ -90,6 +102,7 @@ namespace DotnetMigrations.Lib
 			}
 
 			var duplicateTimestamps = files.GroupBy(x => x.Timestamp).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
+
 			if (duplicateTimestamps.Any())
 			{
 				foreach (var timestamp in duplicateTimestamps)

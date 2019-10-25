@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DotnetMigrations.Lib.Models
 {
@@ -8,6 +9,6 @@ namespace DotnetMigrations.Lib.Models
 		public string ConnectionString { get; set; }
 
 		[Required]
-		public string MigrationsDirectory { get; set; }
+		public ICollection<string> MigrationsDirectories { get; set; }
 	}
 }

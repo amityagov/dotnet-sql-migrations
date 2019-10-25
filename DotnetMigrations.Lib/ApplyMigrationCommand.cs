@@ -28,7 +28,7 @@ namespace DotnetMigrations.Lib
 		/// "-d|--migrationsDirectory"
 		/// "Path to migrations directory"
 		/// </summary>
-		[Option("-d|--migrationsDirectory", "Path to migrations directory", CommandOptionType.SingleValue)]
+		[Option("-d|--migrationsDirectory", "Path to migrations directories, comma separated", CommandOptionType.SingleValue)]
 		public string MigrationsDirectory { get; set; }
 
 		/// <summary>

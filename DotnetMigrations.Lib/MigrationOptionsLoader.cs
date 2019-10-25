@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Configuration;
@@ -8,11 +9,16 @@ namespace DotnetMigrations.Lib
 {
 	public class MigrationOptionsLoader
 	{
+		public class ConfigurationValues
+		{
+			public string MigrationsDirectory { get; set; }
+
+			public string[] MigrationsDirectories { get; set; }
+		}
+
 		private const string DefaultConfigFileName = "migrations-config.json";
 
 		private const string DefaultConnectionStringConfigFileKey = "Default";
-
-		private const string MigrationsDirectoryConfigFileKey = "MigrationsDirectory";
 
 		private readonly ILogger _logger;
 		private readonly IConnectionStringsProcessor _connectionStringsProcessor;
@@ -34,19 +40,111 @@ namespace DotnetMigrations.Lib
 		{
 			options = null;
 
-			var currentDirectory = Directory.GetCurrentDirectory();
+			configFilePath = ProcessConfigFilePath(configFilePath);
 
+			if (configFilePath == null)
+			{
+				return false;
+			}
+
+			var configuration = BuildConfiguration(configFilePath, environmentName);
+
+			if (string.IsNullOrEmpty(connectionString))
+			{
+				connectionStringName = connectionStringName ?? DefaultConnectionStringConfigFileKey;
+				connectionString = configuration.GetConnectionString(connectionStringName);
+			}
+
+			var configurationValues = new ConfigurationValues();
+			configuration.Bind(configurationValues);
+
+			if (string.IsNullOrEmpty(migrationsDirectory))
+			{
+				if (configurationValues.MigrationsDirectories != null &&
+					configurationValues.MigrationsDirectories.Length > 0)
+				{
+					migrationsDirectory = string.Join(",", configurationValues.MigrationsDirectories);
+				}
+			}
+
+			if (string.IsNullOrEmpty(migrationsDirectory))
+			{
+				migrationsDirectory = configurationValues.MigrationsDirectory;
+			}
+
+			TryOverwriteSettingsByEnvironmentVariables(environmentVariables, out var overwrittenMigrationsDirectory,
+				out var overwrittenConnectionString);
+
+			migrationsDirectory = overwrittenMigrationsDirectory ?? migrationsDirectory;
+			connectionString = overwrittenConnectionString ?? connectionString;
+
+			var hasErrors = false;
+
+			var migrationsDirectories = new List<string>();
+
+			if (string.IsNullOrEmpty(migrationsDirectory))
+			{
+				_logger.LogError("Migrations directory does not specified.");
+				hasErrors = true;
+			}
+			else
+			{
+				foreach (var directory in migrationsDirectory.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+				{
+					var localDirectory = directory;
+
+					if (!Path.IsPathRooted(localDirectory))
+					{
+						localDirectory = Path.Combine(Directory.GetCurrentDirectory(), localDirectory);
+					}
+
+					if (!Directory.Exists(localDirectory))
+					{
+						_logger.LogError($"Migrations directory {localDirectory} does not exist.");
+						hasErrors = true;
+					}
+					else
+					{
+						migrationsDirectories.Add(localDirectory);
+					}
+				}
+			}
+
+			connectionString = _connectionStringsProcessor.ProcessConnectionString(connectionString, environmentVariables);
+
+			if (string.IsNullOrEmpty(connectionString))
+			{
+				_logger.LogError("Connection string does not specified.");
+				hasErrors = true;
+			}
+
+			if (hasErrors)
+			{
+				return false;
+			}
+
+			options = new MigrationOptions
+			{
+				ConnectionString = connectionString,
+				MigrationsDirectories = migrationsDirectories
+			};
+
+			return true;
+		}
+
+		public string ProcessConfigFilePath(string configFilePath)
+		{
 			if (!string.IsNullOrEmpty(configFilePath))
 			{
 				if (!File.Exists(configFilePath))
 				{
 					_logger.LogError($"Config file name specified but not found at \"{configFilePath}\".");
-					return false;
+					return null;
 				}
 			}
 			else
 			{
-				var defaultConfigFilePath = Path.Combine(currentDirectory, DefaultConfigFileName);
+				var defaultConfigFilePath = Path.Combine(Directory.GetCurrentDirectory(), DefaultConfigFileName);
 
 				if (File.Exists(defaultConfigFilePath))
 				{
@@ -62,10 +160,15 @@ namespace DotnetMigrations.Lib
 
 				if (isPathFullyQualified == false)
 				{
-					configFilePath = Path.Combine(currentDirectory, configFilePath);
+					configFilePath = Path.Combine(Directory.GetCurrentDirectory(), configFilePath);
 				}
 			}
 
+			return configFilePath;
+		}
+
+		private IConfiguration BuildConfiguration(string configFilePath, string environmentName)
+		{
 			IConfigurationBuilder builder = new ConfigurationBuilder();
 
 			if (File.Exists(configFilePath))
@@ -95,64 +198,21 @@ namespace DotnetMigrations.Lib
 
 			var configuration = builder.Build();
 
-			if (string.IsNullOrEmpty(connectionString))
+			return configuration;
+		}
+
+		private bool TryOverwriteValueByEnvironmentVariable(IDictionary<string, string> environmentValues,
+			string name, out string value)
+		{
+			value = null;
+
+			if (environmentValues.ContainsKey(name))
 			{
-				connectionStringName = connectionStringName ?? DefaultConnectionStringConfigFileKey;
-				connectionString = configuration.GetConnectionString(connectionStringName);
+				value = environmentValues[name];
+				return true;
 			}
 
-			if (string.IsNullOrEmpty(migrationsDirectory))
-			{
-				migrationsDirectory = configuration[MigrationsDirectoryConfigFileKey];
-			}
-
-			TryOverwriteSettingsByEnvironmentVariables(environmentVariables, out var overwrittenMigrationsDirectory,
-				out var overwrittenConnectionString);
-
-			migrationsDirectory = overwrittenMigrationsDirectory ?? migrationsDirectory;
-			connectionString = overwrittenConnectionString ?? connectionString;
-
-			var hasErrors = false;
-
-			if (string.IsNullOrEmpty(migrationsDirectory))
-			{
-				_logger.LogError("Migrations directory does not specified.");
-				hasErrors = true;
-			}
-			else
-			{
-				if (!Path.IsPathRooted(migrationsDirectory))
-				{
-					migrationsDirectory = Path.Combine(currentDirectory, migrationsDirectory);
-				}
-
-				if (!Directory.Exists(migrationsDirectory))
-				{
-					_logger.LogError("Migrations directory does not exist.");
-					hasErrors = true;
-				}
-			}
-
-			connectionString = _connectionStringsProcessor.ProcessConnectionString(connectionString, environmentVariables);
-
-			if (string.IsNullOrEmpty(connectionString))
-			{
-				_logger.LogError("Connection string does not specified.");
-				hasErrors = true;
-			}
-
-			if (hasErrors)
-			{
-				return false;
-			}
-
-			options = new MigrationOptions
-			{
-				ConnectionString = connectionString,
-				MigrationsDirectory = migrationsDirectory
-			};
-
-			return true;
+			return false;
 		}
 
 		private void TryOverwriteSettingsByEnvironmentVariables(IDictionary<string, string> environmentValues,
@@ -161,15 +221,15 @@ namespace DotnetMigrations.Lib
 			migrationsDirectory = null;
 			connectionString = null;
 
-			if (environmentValues.ContainsKey(EnvironmentVariables.MigrationsDirectory))
+			if (!TryOverwriteValueByEnvironmentVariable(environmentValues, EnvironmentVariables.MigrationsDirectories,
+				out migrationsDirectory) || string.IsNullOrEmpty(migrationsDirectory))
 			{
-				migrationsDirectory = environmentValues[EnvironmentVariables.MigrationsDirectory];
+				TryOverwriteValueByEnvironmentVariable(environmentValues, EnvironmentVariables.MigrationsDirectory,
+					out migrationsDirectory);
 			}
 
-			if (environmentValues.ContainsKey(EnvironmentVariables.ConnectionStringName))
-			{
-				connectionString = environmentValues[EnvironmentVariables.ConnectionStringName];
-			}
+			TryOverwriteValueByEnvironmentVariable(environmentValues, EnvironmentVariables.ConnectionStringName,
+				out connectionString);
 		}
 	}
 }

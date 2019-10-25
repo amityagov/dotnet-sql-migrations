@@ -7,6 +7,7 @@ namespace DotnetMigrations.Lib
 	{
 		public static string EnvironmentName = "MIGRATIONS_ENVIRONMENT";
 		public static string MigrationsDirectory = "MIGRATIONS_DIRECTORY";
+		public static string MigrationsDirectories = "MIGRATIONS_DIRECTORIES";
 		public static string ConnectionStringName = "MIGRATIONS_CONNECTIONSTRING";
 
 		public static string DatabaseName = "MIGRATIONS_DATABASE";
@@ -23,12 +24,14 @@ namespace DotnetMigrations.Lib
 			Password,
 			Host,
 			Port,
-			MigrationsDirectory
+			MigrationsDirectory,
+			MigrationsDirectories
 		};
 
 		public static IDictionary<string, string> GetValues()
 		{
 			var variables = System.Environment.GetEnvironmentVariables();
+
 			var target = new Dictionary<string, string>();
 
 			foreach (string key in variables.Keys)
