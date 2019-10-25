@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading;
 using DotnetMigrations.Lib;
 using DotnetMigrations.Lib.NpgsqlProvider;
+using DotnetMigrations.Lib.SqlServerProvider;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -29,8 +30,8 @@ namespace DotnetMigrations8
 			});
 
 			collection.AddMigrations()
-				.AddNpgsqlMigrations();// .AddSqlServerMigrations();
-
+				 .AddSqlServerMigrations();
+			//.AddNpgsqlMigrations();//
 			var services = collection.BuildServiceProvider();
 
 			string VersionGetter() => Assembly.GetEntryAssembly().GetName().Version.ToString();

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Transactions;
 using DotnetMigrations.Lib.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace DotnetMigrations.Lib.SqlServerProvider
 {
@@ -25,12 +26,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 		private static DbConnection CreateConnection(string connectionString)
 		{
-			return new NpgsqlConnection(connectionString);
-		}
-
-		private DbTransaction CreateTransaction(DbConnection connection)
-		{
-			return connection.BeginTransaction();
+			return new SqlConnection(connectionString);
 		}
 
 		private static IEnumerable<MigrationInfo> GetCurrentAppliedMigrations(DbConnection connection)
@@ -41,8 +37,8 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 			using (command)
 			{
-				command.CommandText = $"SELECT \"{nameof(MigrationInfo.Timestamp)}\"," +
-									  $" \"{nameof(MigrationInfo.Hash)}\" FROM public.\"{MigrationHistoryTableName}\";";
+				command.CommandText = $"SELECT {nameof(MigrationInfo.Timestamp)}," +
+									  $" {nameof(MigrationInfo.Hash)} FROM {MigrationHistoryTableName};";
 
 				var reader = command.ExecuteReader();
 
@@ -64,7 +60,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 		private void EnsureMigrationHistoryTableExists(DbConnection connection)
 		{
 			var command = connection.CreateCommand();
-			command.CommandText = $"SELECT count(*) FROM pg_class WHERE relname='{MigrationHistoryTableName}';";
+			command.CommandText = $"SELECT 1 where OBJECT_ID(N'{MigrationHistoryTableName}', N'U') is not null;";
 
 			if (Convert.ToInt32(command.ExecuteScalar()) == 0)
 			{
@@ -74,14 +70,12 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 				using (createMigrationTableCommand)
 				{
-					createMigrationTableCommand.CommandText = $"CREATE TABLE public.\"{MigrationHistoryTableName}\"" +
-															  "(" +
-															  $"\"{nameof(MigrationInfo.Timestamp)}\" character varying(10) NOT NULL," +
-															  $"\"{nameof(MigrationInfo.MigrationName)}\" character varying(128) NOT NULL," +
-															  $"\"{nameof(MigrationInfo.Hash)}\" character varying(32) NOT NULL," +
-															  $"\"{nameof(DateApplied)}\" timestamp without time zone NOT NULL default current_timestamp," +
-															  $"CONSTRAINT \"PK_{MigrationHistoryTableName}\" PRIMARY KEY (\"Hash\")" +
-															  ");";
+					createMigrationTableCommand.CommandText = $@"CREATE TABLE [{MigrationHistoryTableName}] (
+																[{nameof(MigrationInfo.Hash)}] [nvarchar](32) NOT NULL,
+																[{nameof(MigrationInfo.Timestamp)}] [nvarchar](10) NOT NULL,
+																[{nameof(MigrationInfo.MigrationName)}] [nvarchar](128) NOT NULL,
+																[{nameof(DateApplied)}] [datetime] NOT NULL DEFAULT (getdate()),
+															CONSTRAINT [PK_{MigrationHistoryTableName}] PRIMARY KEY({nameof(MigrationInfo.Hash)}));";
 
 					createMigrationTableCommand.ExecuteNonQuery();
 				}
@@ -90,25 +84,23 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 		public void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun)
 		{
-			var connection = CreateConnection(connectionString);
-
-			using (connection)
+			using (var scope = new TransactionScope())
 			{
-				if (dryRun)
-				{
-					_logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
-				}
-				else
-				{
-					_logger.LogInformation("Start migrations.");
-				}
+				var connection = CreateConnection(connectionString);
 
-				connection.Open();
-
-				var transaction = CreateTransaction(connection);
-
-				using (transaction)
+				using (connection)
 				{
+					if (dryRun)
+					{
+						_logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
+					}
+					else
+					{
+						_logger.LogInformation("Start migrations.");
+					}
+
+					connection.Open();
+
 					EnsureMigrationHistoryTableExists(connection);
 					var appliedMigrations = GetCurrentAppliedMigrations(connection);
 
@@ -131,15 +123,15 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 						throw;
 					}
 
+					connection.Close();
+
 					if (dryRun == false)
 					{
-						transaction.Commit();
+						scope.Complete();
 					}
+
+					_logger.LogInformation("Finish migrations.");
 				}
-
-				connection.Close();
-
-				_logger.LogInformation("Finish migrations.");
 			}
 		}
 
@@ -151,7 +143,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 				using (command)
 				{
-					command.CommandText = $"INSERT INTO public.\"{MigrationHistoryTableName}\"" +
+					command.CommandText = $"INSERT INTO \"{MigrationHistoryTableName}\"" +
 										  $"(\"{nameof(MigrationInfo.Timestamp)}\",\"{nameof(MigrationInfo.MigrationName)}\",\"{nameof(MigrationInfo.Hash)}\")" +
 										  $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}')";
 					command.ExecuteNonQuery();
@@ -169,7 +161,6 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 			try
 			{
 				var command = connection.CreateCommand();
-
 				using (command)
 				{
 					command.CommandText = migrationInfo.Data;
