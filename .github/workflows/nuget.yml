@@ -1,0 +1,17 @@
+name: Publish Nuget Package
+
+on: 
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+    name: Publish Nuget Package
+    runs-on: windows-latest
+
+    steps:
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+      
+
