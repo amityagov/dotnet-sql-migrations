@@ -14,14 +14,6 @@ run dotnet migration --help to see available options</Description>
 		<ToolCommandName>dotnet-migration</ToolCommandName>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
 	</PropertyGroup>
-	
-	<PropertyGroup>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	</PropertyGroup>
-	
-	<ItemGroup>
-	  <Compile Include="..\DotnetMigrations.Lib\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.0" />
