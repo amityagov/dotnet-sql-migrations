@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>0.0.33.0</VersionPrefix>
+    <VersionPrefix>0.0.34.0</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <FileVersion>$(VersionPrefix)</FileVersion>
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
