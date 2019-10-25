@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

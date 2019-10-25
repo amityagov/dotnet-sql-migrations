@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using DotnetMigrations.Lib;
+using DotnetMigrations.Lib.NpgsqlProvider;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -27,7 +28,8 @@ namespace DotnetMigrations8
 				builder.AddConsole();
 			});
 
-			collection.AddMigrations();
+			collection.AddMigrations()
+				.AddNpgsqlMigrations();// .AddSqlServerMigrations();
 
 			var services = collection.BuildServiceProvider();
 

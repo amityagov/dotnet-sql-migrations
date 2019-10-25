@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Lib.NpgsqlProvider
 {
 	public class NpgsqlConnectionStringsProcessor : IConnectionStringsProcessor
 	{
 		private readonly ILogger _logger;
+
+		public string Type { get; } = "Npgsql";
 
 		public NpgsqlConnectionStringsProcessor(ILogger<NpgsqlConnectionStringsProcessor> logger)
 		{

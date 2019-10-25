@@ -1,4 +1,4 @@
-﻿namespace DotnetMigrations.Lib
+﻿namespace DotnetMigrations.Lib.Models
 {
 	public class MigrationInfo
 	{

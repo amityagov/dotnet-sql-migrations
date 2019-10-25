@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Lib.NpgsqlProvider
 {
 	public class NpgsqlMigrationExecutor : IMigrationExecutor
 	{
@@ -14,6 +15,8 @@ namespace DotnetMigrations.Lib
 		private readonly ILogger<NpgsqlMigrationExecutor> _logger;
 
 		private const string MigrationHistoryTableName = "___MigrationHistory";
+
+		public string Type { get; } = "Npgsql";
 
 		public NpgsqlMigrationExecutor(ILogger<NpgsqlMigrationExecutor> logger)
 		{

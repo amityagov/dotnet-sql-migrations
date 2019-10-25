@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Lib.Models
 {
 	public class MigrationOptions
 	{
