@@ -1,4 +1,6 @@
-﻿namespace DotnetMigrations.Lib
+﻿using System;
+
+namespace DotnetMigrations.Lib
 {
 	public class Providers
 	{
@@ -8,12 +10,12 @@
 
 		public const string Default = Npgsql;
 
-		public static string[] All =
-		{
-			Npgsql,
-			SqlServer
-		};
-
 		public const string AllString = Npgsql + ", " + SqlServer;
+
+		public static bool IsProviderValid(string value)
+		{
+			return string.Compare(Npgsql, value, StringComparison.InvariantCultureIgnoreCase) == 0 ||
+				string.Compare(SqlServer, value, StringComparison.InvariantCultureIgnoreCase) == 0;
+		}
 	}
 }

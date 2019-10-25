@@ -87,7 +87,7 @@ namespace DotnetMigrations.Lib
 			}
 			else
 			{
-				if (!Providers.All.Contains(providerType))
+				if (!Providers.IsProviderValid(providerType))
 				{
 					_logger.LogError("Unsupported provider: " + providerType);
 

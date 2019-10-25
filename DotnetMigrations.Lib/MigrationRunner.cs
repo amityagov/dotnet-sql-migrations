@@ -29,7 +29,7 @@ namespace DotnetMigrations.Lib
 
 		public int Run(IMigrationRunnerArguments arguments)
 		{
-			var provider = arguments.Provider ?? Providers.Default;
+			var provider = arguments.Provider;
 
 			var configFilePath = arguments.ConfigFilePath;
 			var connectionString = arguments.ConnectionString;
