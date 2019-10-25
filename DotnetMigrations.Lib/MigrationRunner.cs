@@ -11,22 +11,26 @@ namespace DotnetMigrations.Lib
 	public class MigrationRunner
 	{
 		private readonly ILogger _logger;
-		private readonly IMigrationExecutor _executor;
+		private readonly IProviderCollection _providerCollection;
+
 		private readonly MigrationOptionsLoader _migrationOptionsLoader;
 
 		public const string Pattern = "*.sql";
 
 		private readonly Regex _filePattern = new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-		public MigrationRunner(ILogger<MigrationRunner> logger, IMigrationExecutor executor, MigrationOptionsLoader migrationOptionsLoader)
+		public MigrationRunner(ILogger<MigrationRunner> logger, IProviderCollection providerCollection, MigrationOptionsLoader migrationOptionsLoader)
 		{
 			_logger = logger;
-			_executor = executor;
+			_providerCollection = providerCollection;
+
 			_migrationOptionsLoader = migrationOptionsLoader;
 		}
 
 		public int Run(IMigrationRunnerArguments arguments)
 		{
+			var provider = arguments.Provider ?? Providers.Default;
+
 			var configFilePath = arguments.ConfigFilePath;
 			var connectionString = arguments.ConnectionString;
 			var migrationsDirectory = arguments.MigrationsDirectory;
@@ -43,6 +47,7 @@ namespace DotnetMigrations.Lib
 					connectionStringName,
 					environmentName,
 					environmentVariables,
+					provider,
 					out var options))
 				{
 					var files = new List<MigrationInfo>();
@@ -52,7 +57,9 @@ namespace DotnetMigrations.Lib
 
 					if (ValidateDirectories(migrationsDirectories, files))
 					{
-						_executor.Execute(connectionString, files, arguments.DryRun);
+						var executor = _providerCollection.GetMigrationExecutor(options.ProviderType);
+
+						executor.Execute(connectionString, files, arguments.DryRun);
 					}
 
 					return 0;

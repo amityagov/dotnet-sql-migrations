@@ -30,8 +30,9 @@ namespace DotnetMigrations8
 			});
 
 			collection.AddMigrations()
-				 .AddSqlServerMigrations();
-			//.AddNpgsqlMigrations();//
+				.AddSqlServerMigrations()
+				.AddNpgsqlMigrations();
+
 			var services = collection.BuildServiceProvider();
 
 			string VersionGetter() => Assembly.GetEntryAssembly().GetName().Version.ToString();

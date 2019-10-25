@@ -16,7 +16,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 
 		private const string MigrationHistoryTableName = "___MigrationHistory";
 
-		public string Type { get; } = "Npgsql";
+		public string Type { get; } = Providers.Npgsql;
 
 		public NpgsqlMigrationExecutor(ILogger<NpgsqlMigrationExecutor> logger)
 		{

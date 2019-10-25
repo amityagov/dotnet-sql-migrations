@@ -9,7 +9,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 	{
 		private readonly ILogger _logger;
 
-		public string Type { get; } = "Npgsql";
+		public string Type { get; } = Providers.Npgsql;
 
 		public NpgsqlConnectionStringsProcessor(ILogger<NpgsqlConnectionStringsProcessor> logger)
 		{

@@ -17,7 +17,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 		private const string MigrationHistoryTableName = "___MigrationHistory";
 
-		public string Type { get; } = "SqlServer";
+		public string Type { get; } = Providers.SqlServer;
 
 		public SqlServerMigrationExecutor(ILogger<SqlServerMigrationExecutor> logger)
 		{

@@ -8,6 +8,7 @@ namespace DotnetMigrations.Lib
 		{
 			collection.AddSingleton<MigrationOptionsLoader>();
 			collection.AddSingleton<MigrationRunner>();
+			collection.AddSingleton<IProviderCollection, ProviderCollection>();
 
 			return new MigrationsServicesBuilder(collection);
 		}

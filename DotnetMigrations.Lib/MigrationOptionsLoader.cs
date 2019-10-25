@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,8 @@ namespace DotnetMigrations.Lib
 			public string MigrationsDirectory { get; set; }
 
 			public string[] MigrationsDirectories { get; set; }
+
+			public string Provider { get; set; }
 		}
 
 		private const string DefaultConfigFileName = "migrations-config.json";
@@ -21,13 +24,14 @@ namespace DotnetMigrations.Lib
 		private const string DefaultConnectionStringConfigFileKey = "Default";
 
 		private readonly ILogger _logger;
-		private readonly IConnectionStringsProcessor _connectionStringsProcessor;
+
+		private readonly IProviderCollection _providerCollection;
 
 		public MigrationOptionsLoader(ILogger<MigrationOptionsLoader> logger,
-			IConnectionStringsProcessor connectionStringsProcessor)
+			IProviderCollection providerCollection)
 		{
 			_logger = logger;
-			_connectionStringsProcessor = connectionStringsProcessor;
+			_providerCollection = providerCollection;
 		}
 
 		public bool TryGetOptions(string configFilePath,
@@ -36,6 +40,7 @@ namespace DotnetMigrations.Lib
 			string connectionStringName,
 			string environmentName,
 			IDictionary<string, string> environmentVariables,
+			string providerType,
 			out MigrationOptions options)
 		{
 			options = null;
@@ -70,6 +75,24 @@ namespace DotnetMigrations.Lib
 			if (string.IsNullOrEmpty(migrationsDirectory))
 			{
 				migrationsDirectory = configurationValues.MigrationsDirectory;
+			}
+
+			providerType = providerType ?? configurationValues.Provider;
+
+			if (providerType == null)
+			{
+				providerType = Providers.Default;
+
+				_logger.LogWarning("Use default provider: " + providerType);
+			}
+			else
+			{
+				if (!Providers.All.Contains(providerType))
+				{
+					_logger.LogError("Unsupported provider: " + providerType);
+
+					return false;
+				}
 			}
 
 			TryOverwriteSettingsByEnvironmentVariables(environmentVariables, out var overwrittenMigrationsDirectory,
@@ -110,7 +133,9 @@ namespace DotnetMigrations.Lib
 				}
 			}
 
-			connectionString = _connectionStringsProcessor.ProcessConnectionString(connectionString, environmentVariables);
+			var connectionStringsProcessor = _providerCollection.GetConnectionStringsProcessor(providerType);
+
+			connectionString = connectionStringsProcessor.ProcessConnectionString(connectionString, environmentVariables);
 
 			if (string.IsNullOrEmpty(connectionString))
 			{
@@ -126,7 +151,8 @@ namespace DotnetMigrations.Lib
 			options = new MigrationOptions
 			{
 				ConnectionString = connectionString,
-				MigrationsDirectories = migrationsDirectories
+				MigrationsDirectories = migrationsDirectories,
+				ProviderType = providerType
 			};
 
 			return true;

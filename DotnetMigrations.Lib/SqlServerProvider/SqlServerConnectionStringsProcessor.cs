@@ -9,7 +9,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 	{
 		private readonly ILogger _logger;
 
-		public string Type { get; } = "SqlServer";
+		public string Type { get; } = Providers.SqlServer;
 
 		public SqlServerConnectionStringsProcessor(ILogger<SqlServerConnectionStringsProcessor> logger)
 		{

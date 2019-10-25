@@ -10,5 +10,7 @@ namespace DotnetMigrations.Lib.Models
 
 		[Required]
 		public ICollection<string> MigrationsDirectories { get; set; }
+
+		public string ProviderType { get; set; }
 	}
 }

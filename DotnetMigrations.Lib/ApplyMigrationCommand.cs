@@ -6,6 +6,9 @@ namespace DotnetMigrations.Lib
 	[Command("migration")]
 	public class ApplyMigrationCommand : IMigrationRunnerArguments
 	{
+		[Option("-p|--provider", "Database type. Supported providers: " + Providers.AllString, CommandOptionType.SingleValue)]
+		public string Provider { get; set; }
+
 		/// <summary>
 		/// "-c|--config"
 		/// "Path to config file, if not specified, default file \"migrations-config.json\" will be used (is exists)"

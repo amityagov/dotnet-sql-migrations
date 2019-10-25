@@ -3,6 +3,11 @@
 	public interface IMigrationRunnerArguments
 	{
 		/// <summary>
+		/// "-p|--provider"
+		/// </summary>
+		string Provider { get; }
+
+		/// <summary>
 		/// "-c|--config"
 		/// "Path to config file, if not specified, default file \"migrations-config.json\" will be used (is exists)"
 		/// </summary>
