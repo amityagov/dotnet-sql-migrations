@@ -1,0 +1,32 @@
+image: microsoft/dotnet:2.1-sdk
+
+stages:
+  - build
+  - docker
+
+bulid:
+  stage: build
+  tags:
+    - docker
+    - dotnet
+  cache:
+    paths:
+      - ./packages
+  script:
+    - dotnet restore --packages ./packages
+    - dotnet build
+
+publish:
+  stage: docker
+  image: docker:latest
+  tags:
+    - docker
+    - dotnet
+  services:
+    - docker:dind
+  only:
+    - master
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE

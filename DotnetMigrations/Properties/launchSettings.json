@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "DotnetMigrations": {
+      "commandName": "Project"
+    }
+  }
+}
