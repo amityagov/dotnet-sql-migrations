@@ -22,4 +22,4 @@ jobs:
       run: dotnet pack -o ./nupkg
     
     - name: Push      
-      run: dotnet push -k %NUGET_KEY% -s https://nuget.org ./nupkg/*.nupkg 
+      run: dotnet nuget push -k %NUGET_KEY% -s https://nuget.org ./nupkg/*.nupkg 
