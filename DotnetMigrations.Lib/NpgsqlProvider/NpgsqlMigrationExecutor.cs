@@ -89,6 +89,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
 			{
 				var connection = CreateConnection(connectionString);
+
 				using (connection)
 				{
 					if (dryRun)
@@ -162,6 +163,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			try
 			{
 				var command = connection.CreateCommand();
+				command.CommandTimeout = 300;
 
 				using (command)
 				{
