@@ -29,8 +29,6 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 				builder = new NpgsqlConnectionStringBuilder();
 			}
 
-			builder.Timeout = 120;
-
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Host))
 			{
 				builder.Host = environmentVariables[EnvironmentVariables.Host];

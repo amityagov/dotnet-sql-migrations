@@ -84,7 +84,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 		public void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun)
 		{
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
 			{
 				var connection = CreateConnection(connectionString);
 

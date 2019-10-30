@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Transactions;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -26,11 +27,6 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 		private static DbConnection CreateConnection(string connectionString)
 		{
 			return new NpgsqlConnection(connectionString);
-		}
-
-		private DbTransaction CreateTransaction(DbConnection connection)
-		{
-			return connection.BeginTransaction();
 		}
 
 		private static IEnumerable<MigrationInfo> GetCurrentAppliedMigrations(DbConnection connection)
@@ -90,25 +86,22 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 
 		public void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun)
 		{
-			var connection = CreateConnection(connectionString);
-
-			using (connection)
+			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
 			{
-				if (dryRun)
+				var connection = CreateConnection(connectionString);
+				using (connection)
 				{
-					_logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
-				}
-				else
-				{
-					_logger.LogInformation("Start migrations.");
-				}
+					if (dryRun)
+					{
+						_logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
+					}
+					else
+					{
+						_logger.LogInformation("Start migrations.");
+					}
 
-				connection.Open();
+					connection.Open();
 
-				var transaction = CreateTransaction(connection);
-
-				using (transaction)
-				{
 					EnsureMigrationHistoryTableExists(connection);
 					var appliedMigrations = GetCurrentAppliedMigrations(connection);
 
@@ -133,13 +126,13 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 
 					if (dryRun == false)
 					{
-						transaction.Commit();
+						scope.Complete();
 					}
+
+					connection.Close();
+
+					_logger.LogInformation("Finish migrations.");
 				}
-
-				connection.Close();
-
-				_logger.LogInformation("Finish migrations.");
 			}
 		}
 
