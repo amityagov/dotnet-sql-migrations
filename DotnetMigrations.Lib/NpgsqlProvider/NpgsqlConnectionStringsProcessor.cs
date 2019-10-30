@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -28,6 +28,8 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			{
 				builder = new NpgsqlConnectionStringBuilder();
 			}
+
+			builder.Timeout = 120;
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Host))
 			{
