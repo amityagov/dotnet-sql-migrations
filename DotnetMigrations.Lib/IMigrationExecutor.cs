@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using DotnetMigrations.Lib.Models;
 
 namespace DotnetMigrations.Lib
@@ -9,7 +11,8 @@ namespace DotnetMigrations.Lib
 		/// <summary>
 		/// <exception cref="Exception">If migrations failed</exception>
 		/// </summary>
-		void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun);
+		Task ExecuteAsync(string connectionString, IList<MigrationInfo> files, bool dryRun,
+			CancellationToken cancellationToken);
 
 		string Type { get; }
 	}

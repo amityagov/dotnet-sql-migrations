@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
@@ -84,9 +86,10 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			}
 		}
 
-		public void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun)
+		public async Task ExecuteAsync(string connectionString, IList<MigrationInfo> files, bool dryRun,
+			CancellationToken cancellationToken)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
+			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var connection = CreateConnection(connectionString);
 
@@ -115,7 +118,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 					{
 						foreach (var migrationInfo in migrationsToApply)
 						{
-							ApplyMigration(migrationInfo, connection);
+							await ApplyMigration(migrationInfo, connection, cancellationToken);
 							WriteMigrationAppliedData(migrationInfo, connection);
 						}
 					}
@@ -158,7 +161,8 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			}
 		}
 
-		private void ApplyMigration(MigrationInfo migrationInfo, DbConnection connection)
+		private async Task ApplyMigration(MigrationInfo migrationInfo, DbConnection connection,
+			CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -168,7 +172,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 				using (command)
 				{
 					command.CommandText = migrationInfo.Data;
-					command.ExecuteNonQuery();
+					await command.ExecuteNonQueryAsync(cancellationToken);
 
 					_logger.LogInformation($"Migration {migrationInfo.MigrationName} applied.");
 				}

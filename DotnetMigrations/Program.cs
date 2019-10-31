@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using DotnetMigrations.Lib;
 using DotnetMigrations.Lib.NpgsqlProvider;
 using DotnetMigrations.Lib.SqlServerProvider;
@@ -17,7 +18,7 @@ namespace DotnetMigrations8
 
 		public const string MigrationsInfiniteSleepEnvironmentVariable = "MIGRATIONS_INFINITE_SLEEP";
 
-		public static int Main(string[] args)
+		public static async Task<int> Main(string[] args)
 		{
 			var startDelay = Environment.GetEnvironmentVariable(MigrationsStartDelaySecondsEnvironmentVariable);
 
@@ -54,7 +55,7 @@ namespace DotnetMigrations8
 			{
 				try
 				{
-					code = application.Execute(args);
+					code = await application.ExecuteAsync(args);
 				}
 				catch (Exception e)
 				{

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
 
@@ -27,7 +29,7 @@ namespace DotnetMigrations.Lib
 			_migrationOptionsLoader = migrationOptionsLoader;
 		}
 
-		public int Run(IMigrationRunnerArguments arguments)
+		public async Task<int> RunAsync(IMigrationRunnerArguments arguments, CancellationToken cancellationToken)
 		{
 			var provider = arguments.Provider;
 
@@ -59,7 +61,7 @@ namespace DotnetMigrations.Lib
 					{
 						var executor = _providerCollection.GetMigrationExecutor(options.ProviderType);
 
-						executor.Execute(connectionString, files, arguments.DryRun);
+						await executor.ExecuteAsync(connectionString, files, arguments.DryRun, cancellationToken);
 					}
 
 					return 0;

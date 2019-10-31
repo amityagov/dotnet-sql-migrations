@@ -1,4 +1,6 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetMigrations.Lib
@@ -55,11 +57,11 @@ namespace DotnetMigrations.Lib
 		[Option("-dry|--dry", "Dry run, apply scripts without commit transaction", CommandOptionType.NoValue)]
 		public bool DryRun { get; set; }
 
-		public int OnExecute(CommandLineApplication app, IConsole console)
+		public async Task<int> OnExecuteAsync(CommandLineApplication app, IConsole console, CancellationToken cancellationToken)
 		{
 			var runner = app.GetRequiredService<MigrationRunner>();
 
-			var result = runner.Run(this);
+			var result = await runner.RunAsync(this, cancellationToken);
 
 			if (result > 0)
 			{

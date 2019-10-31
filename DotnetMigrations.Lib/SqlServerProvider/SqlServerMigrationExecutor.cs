@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Data.SqlClient;
@@ -82,9 +85,10 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 			}
 		}
 
-		public void Execute(string connectionString, IList<MigrationInfo> files, bool dryRun)
+		public async Task ExecuteAsync(string connectionString, IList<MigrationInfo> files, bool dryRun,
+			CancellationToken cancellationToken)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5)))
+			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var connection = CreateConnection(connectionString);
 
@@ -113,7 +117,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 					{
 						foreach (var migrationInfo in migrationsToApply)
 						{
-							ApplyMigration(migrationInfo, connection);
+							await ApplyMigration(migrationInfo, connection, cancellationToken);
 							WriteMigrationAppliedData(migrationInfo, connection);
 						}
 					}
@@ -156,17 +160,24 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 			}
 		}
 
-		private void ApplyMigration(MigrationInfo migrationInfo, DbConnection connection)
+		private async Task ApplyMigration(MigrationInfo migrationInfo, DbConnection connection,
+			CancellationToken cancellationToken)
 		{
 			try
 			{
+				var sw = new Stopwatch();
+				sw.Start();
+
 				var command = connection.CreateCommand();
 				using (command)
 				{
 					command.CommandText = migrationInfo.Data;
-					command.ExecuteNonQuery();
 
-					_logger.LogInformation($"Migration {migrationInfo.MigrationName} applied.");
+					await command.ExecuteNonQueryAsync(cancellationToken);
+
+					sw.Stop();
+
+					_logger.LogInformation($"Migration {migrationInfo.MigrationName} applied in {sw.Elapsed}.");
 				}
 			}
 			catch (Exception e)
