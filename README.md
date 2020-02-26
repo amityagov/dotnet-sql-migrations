@@ -20,29 +20,29 @@ Startup.cs
 
 public override void ConfigureServices(IServiceCollection collection)
 {
-	collection.AddMigrations((provider, options) =>
-	{
-		var configuration = provider.GetRequiredService<IConfiguration>();
-		var environment = provider.GetRequiredService<IHostEnvironment>();
+    collection.AddMigrations((provider, options) =>
+    {
+        var configuration = provider.GetRequiredService<IConfiguration>();
+        var environment = provider.GetRequiredService<IHostEnvironment>();
 
-		var connectionString = configuration.GetConnectionString("Default");
+        var connectionString = configuration.GetConnectionString("Default");
 
-		options.DryRun = false; // do not commit transaction after migrations applied, default = false
-		options.Pattern = "*.sql"; // default = "*.sql";
+        options.DryRun = false; // do not commit transaction after migrations applied, default = false
+        options.Pattern = "*.sql"; // default = "*.sql";
 
-		// Supported providers
-		options.ProviderType = Providers.Npgsql;
-		// options.ProviderType = Providers.SqlServer;
+        // Supported providers
+        options.ProviderType = Providers.Npgsql;
+        // options.ProviderType = Providers.SqlServer;
 
-		options.ConnectionString = connectionString;
-		options.FileProviders = new IFileProvider[]
-		{
-			new PhysicalFileProvider(Path.Combine(environment.ContentRootPath, "sql")), // folder
-			new EmbeddedFileProvider(GetType().Assembly, "SqlResourcesNamespace") // embedded sql files
-		};
-	});
+        options.ConnectionString = connectionString;
+        options.FileProviders = new IFileProvider[]
+        {
+            new PhysicalFileProvider(Path.Combine(environment.ContentRootPath, "sql")), // folder
+            new EmbeddedFileProvider(GetType().Assembly, "SqlResourcesNamespace") // embedded sql files
+        };
+    });
 
-	...
+    ...
 }
 ```
 
