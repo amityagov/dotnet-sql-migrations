@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetMigrations.Command;
 using DotnetMigrations.Lib;
 using DotnetMigrations.Lib.NpgsqlProvider;
 using DotnetMigrations.Lib.SqlServerProvider;
@@ -30,9 +31,7 @@ namespace DotnetMigrations8
 				builder.AddConsole();
 			});
 
-			collection.AddMigrations()
-				.AddSqlServerMigrations()
-				.AddNpgsqlMigrations();
+			collection.AddMigrations().AddCommands();
 
 			var services = collection.BuildServiceProvider();
 

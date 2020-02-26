@@ -1,49 +1,45 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
+using DotnetMigrations.Lib;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
-namespace DotnetMigrations.Lib.SqlServerProvider
+namespace DotnetMigrations.Command
 {
-	public class SqlServerConnectionStringsProcessor : IConnectionStringsProcessor
+	public class NpgsqlConnectionStringsProcessor : IConnectionStringsProcessor
 	{
 		private readonly ILogger _logger;
 
-		public string Type { get; } = Providers.SqlServer;
+		public string Type { get; } = Providers.Npgsql;
 
-		public SqlServerConnectionStringsProcessor(ILogger<SqlServerConnectionStringsProcessor> logger)
+		public NpgsqlConnectionStringsProcessor(ILogger<NpgsqlConnectionStringsProcessor> logger)
 		{
 			_logger = logger;
 		}
 
 		public string ProcessConnectionString(string connectionString, IDictionary<string, string> environmentVariables)
 		{
-			SqlConnectionStringBuilder builder;
+			NpgsqlConnectionStringBuilder builder;
 
 			if (connectionString != null)
 			{
-				builder = new SqlConnectionStringBuilder(connectionString);
+				builder = new NpgsqlConnectionStringBuilder(connectionString);
 			}
 			else
 			{
-				builder = new SqlConnectionStringBuilder();
+				builder = new NpgsqlConnectionStringBuilder();
 			}
-
-			var dataSource = builder.DataSource;
-
-			var setDataSource = false;
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Host))
 			{
-				dataSource = environmentVariables[EnvironmentVariables.Host];
-				setDataSource = true;
+				builder.Host = environmentVariables[EnvironmentVariables.Host];
 			}
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Port))
 			{
 				if (int.TryParse(environmentVariables[EnvironmentVariables.Port], out var port))
 				{
-					dataSource = $"{dataSource},{port}";
+					builder.Port = port;
 				}
 				else
 				{
@@ -55,19 +51,14 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 				}
 			}
 
-			if (setDataSource)
-			{
-				builder.DataSource = dataSource;
-			}
-
 			if (environmentVariables.ContainsKey(EnvironmentVariables.DatabaseName))
 			{
-				builder.InitialCatalog = environmentVariables[EnvironmentVariables.DatabaseName];
+				builder.Database = environmentVariables[EnvironmentVariables.DatabaseName];
 			}
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.UserName))
 			{
-				builder.UserID = environmentVariables[EnvironmentVariables.UserName];
+				builder.Username = environmentVariables[EnvironmentVariables.UserName];
 			}
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Password))
@@ -77,7 +68,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 			if (builder.ConnectionString.Length > 0)
 			{
-				var sensoredPasswordBuilder = new SqlConnectionStringBuilder(builder.ConnectionString)
+				var sensoredPasswordBuilder = new NpgsqlConnectionStringBuilder(builder.ConnectionString)
 				{
 					Password = "--HIDDEN--"
 				};

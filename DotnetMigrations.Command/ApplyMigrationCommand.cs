@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using DotnetMigrations.Lib;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	[Command("migration")]
 	public class ApplyMigrationCommand : IMigrationRunnerArguments
@@ -59,9 +60,9 @@ namespace DotnetMigrations.Lib
 
 		public async Task<int> OnExecuteAsync(CommandLineApplication app, IConsole console, CancellationToken cancellationToken)
 		{
-			var runner = app.GetRequiredService<MigrationRunner>();
+			var runner = app.GetRequiredService<CommandMigrationRunner>();
 
-			var result = await runner.RunAsync(this, cancellationToken);
+			var result = await runner.ExecuteAsync(this, cancellationToken);
 
 			if (result > 0)
 			{

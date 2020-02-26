@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	public static class Help
 	{

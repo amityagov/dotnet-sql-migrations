@@ -1,6 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	public interface IConnectionStringsProcessor
 	{

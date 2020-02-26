@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using DotnetMigrations.Lib;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	public class MigrationOptionsLoader
 	{
@@ -26,12 +26,15 @@ namespace DotnetMigrations.Lib
 		private readonly ILogger _logger;
 
 		private readonly IProviderCollection _providerCollection;
+		private readonly IConnectionStringsProcessorCollection _connectionStringsProcessorCollection;
 
 		public MigrationOptionsLoader(ILogger<MigrationOptionsLoader> logger,
-			IProviderCollection providerCollection)
+			IProviderCollection providerCollection,
+			IConnectionStringsProcessorCollection connectionStringsProcessorCollection)
 		{
 			_logger = logger;
 			_providerCollection = providerCollection;
+			_connectionStringsProcessorCollection = connectionStringsProcessorCollection;
 		}
 
 		public bool TryGetOptions(string configFilePath,
@@ -133,7 +136,7 @@ namespace DotnetMigrations.Lib
 				}
 			}
 
-			var connectionStringsProcessor = _providerCollection.GetConnectionStringsProcessor(providerType);
+			var connectionStringsProcessor = _connectionStringsProcessorCollection.GetConnectionStringsProcessor(providerType);
 
 			connectionString = connectionStringsProcessor.ProcessConnectionString(connectionString, environmentVariables);
 
@@ -202,7 +205,7 @@ namespace DotnetMigrations.Lib
 				builder = builder.AddJsonFile(configFilePath, false);
 			}
 
-			var environmentNameFormEnvironment = System.Environment.GetEnvironmentVariable(EnvironmentVariables.EnvironmentName);
+			var environmentNameFormEnvironment = Environment.GetEnvironmentVariable(EnvironmentVariables.EnvironmentName);
 
 			environmentName = environmentNameFormEnvironment ?? environmentName;
 
@@ -244,9 +247,6 @@ namespace DotnetMigrations.Lib
 		private void TryOverwriteSettingsByEnvironmentVariables(IDictionary<string, string> environmentValues,
 			out string migrationsDirectory, out string connectionString)
 		{
-			migrationsDirectory = null;
-			connectionString = null;
-
 			if (!TryOverwriteValueByEnvironmentVariable(environmentValues, EnvironmentVariables.MigrationsDirectories,
 				out migrationsDirectory) || string.IsNullOrEmpty(migrationsDirectory))
 			{

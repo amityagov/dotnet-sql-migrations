@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netcoreapp2.1</TargetFramework>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<AssemblyName>DotnetMigrations8</AssemblyName>
 		<OutputType>Exe</OutputType>
 		<PackageId>DotnetMigrations8</PackageId>
@@ -28,5 +28,6 @@ run dotnet migration --help to see available options</Description>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
+	  <ProjectReference Include="..\DotnetMigrations8.Command\DotnetMigrations.Command.csproj" />
 	</ItemGroup>	
 </Project>

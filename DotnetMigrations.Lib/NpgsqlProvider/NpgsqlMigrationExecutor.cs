@@ -86,7 +86,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			}
 		}
 
-		public async Task ExecuteAsync(string connectionString, IList<MigrationInfo> files, bool dryRun,
+		public async Task ExecuteAsync(string connectionString, ICollection<MigrationInfo> files, bool dryRun,
 			CancellationToken cancellationToken)
 		{
 			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled))

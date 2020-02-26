@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	public static class EnvironmentVariables
 	{

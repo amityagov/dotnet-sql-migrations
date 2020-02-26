@@ -9,20 +9,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.0.100
-    
+
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    
+
     - name: Pack
       run: dotnet pack -o ./nupkg
-    
-    - name: Push      
-      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.Lib.*.nupkg 
-        
-    - name: Push      
-      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.*.nupkg 
+
+    - name: Push
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.Lib.*.nupkg
+
+    - name: Push
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.Command.*.nupkg
+
+    - name: Push
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.*.nupkg

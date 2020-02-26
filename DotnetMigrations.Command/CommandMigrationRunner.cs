@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetMigrations.Lib;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
-	public class MigrationRunner
+	public class CommandMigrationRunner
 	{
 		private readonly ILogger _logger;
 		private readonly IProviderCollection _providerCollection;
@@ -21,15 +22,15 @@ namespace DotnetMigrations.Lib
 
 		private readonly Regex _filePattern = new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-		public MigrationRunner(ILogger<MigrationRunner> logger, IProviderCollection providerCollection, MigrationOptionsLoader migrationOptionsLoader)
+		public CommandMigrationRunner(ILogger<CommandMigrationRunner> logger, IProviderCollection providerCollection,
+			MigrationOptionsLoader migrationOptionsLoader)
 		{
 			_logger = logger;
 			_providerCollection = providerCollection;
-
 			_migrationOptionsLoader = migrationOptionsLoader;
 		}
 
-		public async Task<int> RunAsync(IMigrationRunnerArguments arguments, CancellationToken cancellationToken)
+		public async Task<int> ExecuteAsync(IMigrationRunnerArguments arguments, CancellationToken cancellationToken)
 		{
 			var provider = arguments.Provider;
 
@@ -77,19 +78,19 @@ namespace DotnetMigrations.Lib
 			}
 		}
 
-		private bool ValidateDirectories(ICollection<string> migrationsDirectories, IList<MigrationInfo> files)
+		private bool ValidateDirectories(ICollection<string> migrationsDirectories, IList<MigrationInfo> target)
 		{
 			bool success = true;
 
 			foreach (var directoryPath in migrationsDirectories)
 			{
-				success &= ValidateFiles(directoryPath, files);
+				success &= ValidateFiles(directoryPath, target);
 			}
 
 			return success;
 		}
 
-		private bool ValidateFiles(string directoryPath, IList<MigrationInfo> files)
+		private bool ValidateFiles(string directoryPath, IList<MigrationInfo> target)
 		{
 			_logger.LogInformation($"Validate migrations directory: \"{directoryPath}\".");
 
@@ -107,10 +108,10 @@ namespace DotnetMigrations.Lib
 					continue;
 				}
 
-				files.Add(info);
+				target.Add(info);
 			}
 
-			var duplicateTimestamps = files.GroupBy(x => x.Timestamp).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
+			var duplicateTimestamps = target.GroupBy(x => x.Timestamp).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
 
 			if (duplicateTimestamps.Any())
 			{

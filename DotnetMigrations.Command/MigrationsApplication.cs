@@ -1,7 +1,7 @@
 ﻿using System;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace DotnetMigrations.Lib
+namespace DotnetMigrations.Command
 {
 	public static class MigrationsApplication
 	{

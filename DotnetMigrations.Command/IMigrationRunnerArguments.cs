@@ -1,4 +1,4 @@
-﻿namespace DotnetMigrations.Lib
+﻿namespace DotnetMigrations.Command
 {
 	public interface IMigrationRunnerArguments
 	{

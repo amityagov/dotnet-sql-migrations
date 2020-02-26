@@ -11,7 +11,7 @@ namespace DotnetMigrations.Lib
 		/// <summary>
 		/// <exception cref="Exception">If migrations failed</exception>
 		/// </summary>
-		Task ExecuteAsync(string connectionString, IList<MigrationInfo> files, bool dryRun,
+		Task ExecuteAsync(string connectionString, ICollection<MigrationInfo> files, bool dryRun,
 			CancellationToken cancellationToken);
 
 		string Type { get; }
