@@ -28,10 +28,10 @@ public override void ConfigureServices(IServiceCollection collection)
         var connectionString = configuration.GetConnectionString("Default");
 
         options.DryRun = false; // do not commit transaction after migrations applied, default = false
-        options.Pattern = "*.sql"; // default = "*.sql";
+        options.Pattern = "*.sql"; // default = *.sql
 
         // Supported providers
-        options.ProviderType = Providers.Npgsql;
+        options.ProviderType = Providers.Npgsql; // default
         // options.ProviderType = Providers.SqlServer;
 
         options.ConnectionString = connectionString;
