@@ -22,10 +22,10 @@ jobs:
       run: dotnet pack -o ./nupkg
 
     - name: Push
-      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.Lib.*.nupkg
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://nuget.org ./nupkg/DotnetMigrations8.Lib.*.nupkg
 
     - name: Push
-      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.Command.*.nupkg
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://nuget.org ./nupkg/DotnetMigrations8.Command.*.nupkg
 
     - name: Push
-      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://nuget.org ./nupkg/DotnetMigrations8.*.nupkg
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://nuget.org ./nupkg/DotnetMigrations8.*.nupkg
