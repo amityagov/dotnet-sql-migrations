@@ -27,7 +27,7 @@ run dotnet migration --help to see available options</Description>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
-	  <ProjectReference Include="..\DotnetMigrations8.Command\DotnetMigrations.Command.csproj" />
-	</ItemGroup>	
+		<ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
+		<ProjectReference Include="..\DotnetMigrations.Command\DotnetMigrations.Command.csproj" />
+	</ItemGroup>
 </Project>

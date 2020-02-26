@@ -9,6 +9,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
+		<ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
 	</ItemGroup>
 </Project>
