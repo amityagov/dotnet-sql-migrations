@@ -65,8 +65,6 @@ namespace DotnetMigrations.Lib
 						};
 					}
 				}
-
-				yield break;
 			}
 		}
 	}
