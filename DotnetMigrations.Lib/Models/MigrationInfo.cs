@@ -1,4 +1,6 @@
-﻿namespace DotnetMigrations.Lib.Models
+﻿using System.Collections.Generic;
+
+namespace DotnetMigrations.Lib.Models
 {
 	public class MigrationInfo
 	{
@@ -34,14 +36,39 @@
 			return (Timestamp != null ? Timestamp.GetHashCode() : 0);
 		}
 
-		public static bool operator ==(MigrationInfo left, MigrationInfo right)
+		private sealed class TimestampEqualityComparer : IEqualityComparer<MigrationInfo>
 		{
-			return Equals(left, right);
+			public bool Equals(MigrationInfo x, MigrationInfo y)
+			{
+				if (ReferenceEquals(x, y))
+				{
+					return true;
+				}
+
+				if (ReferenceEquals(x, null))
+				{
+					return false;
+				}
+
+				if (ReferenceEquals(y, null))
+				{
+					return false;
+				}
+
+				if (x.GetType() != y.GetType())
+				{
+					return false;
+				}
+
+				return x.Timestamp == y.Timestamp;
+			}
+
+			public int GetHashCode(MigrationInfo obj)
+			{
+				return (obj.Timestamp != null ? obj.Timestamp.GetHashCode() : 0);
+			}
 		}
 
-		public static bool operator !=(MigrationInfo left, MigrationInfo right)
-		{
-			return !Equals(left, right);
-		}
+		public static IEqualityComparer<MigrationInfo> TimestampComparer { get; } = new TimestampEqualityComparer();
 	}
 }

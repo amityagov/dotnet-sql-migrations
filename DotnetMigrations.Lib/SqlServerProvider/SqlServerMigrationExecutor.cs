@@ -108,7 +108,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 					EnsureMigrationHistoryTableExists(connection);
 					var appliedMigrations = GetCurrentAppliedMigrations(connection);
 
-					var migrationsToApply = files.Except(appliedMigrations).ToArray();
+					var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
 					_logger.LogInformation($"Ready to apply {migrationsToApply.Length} migrations.");
 
 					migrationsToApply = migrationsToApply.OrderBy(x => x.Timestamp).ToArray();
