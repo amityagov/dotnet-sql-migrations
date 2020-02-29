@@ -109,18 +109,6 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 					EnsureMigrationHistoryTableExists(connection);
 					IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
 
-					if (_logger.IsEnabled(LogLevel.Debug))
-					{
-						_logger.LogDebug("Loaded migrations: " + Environment.NewLine + string.Join(Environment.NewLine,
-											 files.Select(x => x.MigrationName)));
-					}
-
-					if (_logger.IsEnabled(LogLevel.Debug))
-					{
-						_logger.LogDebug("Applied migrations: " + Environment.NewLine + string.Join(Environment.NewLine,
-											 appliedMigrations.Select(x => x.MigrationName)));
-					}
-
 					var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
 					_logger.LogInformation($"Ready to apply {migrationsToApply.Length} migrations.");
 
