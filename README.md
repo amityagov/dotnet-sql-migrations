@@ -10,6 +10,8 @@
 
 [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) for running migrations from command line.
 
+`dotnet tool install --global DotnetMigrations8`
+
 ## DotnetMigrations8.Lib
 [Nuget](https://www.nuget.org/packages/DotnetMigrations8.Lib)
 
