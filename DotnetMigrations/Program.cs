@@ -4,8 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetMigrations.Command;
 using DotnetMigrations.Lib;
-using DotnetMigrations.Lib.NpgsqlProvider;
-using DotnetMigrations.Lib.SqlServerProvider;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

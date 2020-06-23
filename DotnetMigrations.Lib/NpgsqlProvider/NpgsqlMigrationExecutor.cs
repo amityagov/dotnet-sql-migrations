@@ -1,37 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Transactions;
 using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace DotnetMigrations.Lib.NpgsqlProvider
 {
-	public class NpgsqlMigrationExecutor : IMigrationExecutor
+	public class NpgsqlMigrationExecutor : MigrationExecutor<NpgsqlConnection>
 	{
-		public const string DateApplied = "DateApplied";
-
 		private readonly ILogger<NpgsqlMigrationExecutor> _logger;
 
-		private const string MigrationHistoryTableName = "___MigrationHistory";
-
-		public string Type { get; } = Providers.Npgsql;
+		public override string Type { get; } = Providers.Npgsql;
 
 		public NpgsqlMigrationExecutor(ILogger<NpgsqlMigrationExecutor> logger)
+			: base(logger)
 		{
 			_logger = logger;
 		}
 
-		private static DbConnection CreateConnection(string connectionString)
-		{
-			return new NpgsqlConnection(connectionString);
-		}
-
-		private static ICollection<MigrationInfo> GetCurrentAppliedMigrations(DbConnection connection)
+		protected override IEnumerable<MigrationInfo> GetCurrentAppliedMigrations(DbConnection connection)
 		{
 			var command = connection.CreateCommand();
 
@@ -40,7 +28,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			using (command)
 			{
 				command.CommandText = $"SELECT \"{nameof(MigrationInfo.Timestamp)}\"," +
-									  $" \"{nameof(MigrationInfo.Hash)}\" FROM public.\"{MigrationHistoryTableName}\";";
+									  $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
 
 				var reader = command.ExecuteReader();
 
@@ -59,7 +47,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			return migrations.ToArray();
 		}
 
-		private void EnsureMigrationHistoryTableExists(DbConnection connection)
+		protected override void EnsureMigrationHistoryTableExists(DbConnection connection)
 		{
 			var command = connection.CreateCommand();
 			command.CommandText = $"SELECT count(*) FROM pg_class WHERE relname='{MigrationHistoryTableName}';";
@@ -86,102 +74,15 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			}
 		}
 
-		public async Task ExecuteAsync(string connectionString, ICollection<MigrationInfo> files, bool dryRun,
-			CancellationToken cancellationToken)
+		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo, DbConnection connection)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled))
-			{
-				var connection = CreateConnection(connectionString);
+			var command = connection.CreateCommand();
 
-				using (connection)
-				{
-					if (dryRun)
-					{
-						_logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
-					}
-					else
-					{
-						_logger.LogInformation("Start migrations.");
-					}
+			command.CommandText = $"INSERT INTO public.\"{MigrationHistoryTableName}\"" +
+								  $"(\"{nameof(MigrationInfo.Timestamp)}\",\"{nameof(MigrationInfo.MigrationName)}\",\"{nameof(MigrationInfo.Hash)}\")" +
+								  $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}')";
 
-					connection.Open();
-
-					EnsureMigrationHistoryTableExists(connection);
-					IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
-
-					var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
-					_logger.LogInformation($"Ready to apply {migrationsToApply.Length} migrations.");
-
-					migrationsToApply = migrationsToApply.OrderBy(x => x.Timestamp).ToArray();
-
-					try
-					{
-						foreach (var migrationInfo in migrationsToApply)
-						{
-							await ApplyMigration(migrationInfo, connection, cancellationToken);
-							WriteMigrationAppliedData(migrationInfo, connection);
-						}
-					}
-					catch (Exception)
-					{
-						_logger.LogError("Some errors occured. Rollback all changes and exit. Have a nice day.");
-						throw;
-					}
-
-					if (dryRun == false)
-					{
-						scope.Complete();
-					}
-
-					connection.Close();
-
-					_logger.LogInformation("Finish migrations.");
-				}
-			}
-		}
-
-		private void WriteMigrationAppliedData(MigrationInfo migrationInfo, DbConnection connection)
-		{
-			try
-			{
-				var command = connection.CreateCommand();
-
-				using (command)
-				{
-					command.CommandText = $"INSERT INTO public.\"{MigrationHistoryTableName}\"" +
-										  $"(\"{nameof(MigrationInfo.Timestamp)}\",\"{nameof(MigrationInfo.MigrationName)}\",\"{nameof(MigrationInfo.Hash)}\")" +
-										  $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}')";
-					command.ExecuteNonQuery();
-				}
-			}
-			catch (Exception e)
-			{
-				_logger.LogError($"Error while write migration data {migrationInfo.MigrationName} - {e.Message}.");
-				throw;
-			}
-		}
-
-		private async Task ApplyMigration(MigrationInfo migrationInfo, DbConnection connection,
-			CancellationToken cancellationToken)
-		{
-			try
-			{
-				var command = connection.CreateCommand();
-				command.CommandTimeout = 300;
-
-				using (command)
-				{
-					command.CommandText = migrationInfo.Data;
-					await command.ExecuteNonQueryAsync(cancellationToken);
-
-					_logger.LogInformation($"Migration {migrationInfo.MigrationName} applied.");
-				}
-			}
-			catch (Exception e)
-			{
-				_logger.LogError($"Error while applying {migrationInfo.MigrationName} - {e.Message}.");
-				throw;
-			}
+			return command;
 		}
 	}
 }
