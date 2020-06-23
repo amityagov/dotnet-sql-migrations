@@ -35,6 +35,7 @@ public override void ConfigureServices(IServiceCollection collection)
         // Supported providers
         options.ProviderType = Providers.Npgsql; // default
         // options.ProviderType = Providers.SqlServer;
+		// options.ProviderType = Providers.Sqlite;
 
         options.ConnectionString = connectionString;
         options.FileProviders = new IFileProvider[]
