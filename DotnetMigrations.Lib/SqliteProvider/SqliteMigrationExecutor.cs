@@ -57,7 +57,7 @@ namespace DotnetMigrations.Lib.SqliteProvider
 				}
 			}
 
-			return migrations.ToArray();
+			return migrations;
 		}
 
 		protected override void EnsureMigrationHistoryTableExists(DbConnection connection)

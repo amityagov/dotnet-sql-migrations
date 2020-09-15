@@ -44,7 +44,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 				}
 			}
 
-			return migrations.ToArray();
+			return migrations;
 		}
 
 		protected override void EnsureMigrationHistoryTableExists(DbConnection connection)
