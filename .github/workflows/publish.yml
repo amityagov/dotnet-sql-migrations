@@ -32,3 +32,6 @@ jobs:
 
     - name: Push
       run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://nuget.org ./nupkg/DotnetMigrations8.*.nupkg
+
+    - name: Push
+      run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://nuget.org ./nupkg/DotnetMigrations8.Arity.DataAnnotations.*.nupkg
