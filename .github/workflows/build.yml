@@ -16,12 +16,3 @@ jobs:
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    
-    - name: Run Infer#      
-      uses: microsoft/infersharpaction@v0.2
-      id: runinfersharp
-      with:
-        binary-path: /DotnetMigrations/bin/Release/netcoreapp3.1/
-      
-    - name: Infer# analysis results
-      run: echo "${{ steps.runinfersharp.outputs.results }}"
