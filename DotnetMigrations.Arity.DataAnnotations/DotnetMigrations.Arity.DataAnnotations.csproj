@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>DotnetMigrations8.Arity.DataAnnotations</AssemblyName>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Arity.Abstractions" Version="0.0.9" />
   </ItemGroup>

@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<AssemblyName>DotnetMigrations8</AssemblyName>
 		<OutputType>Exe</OutputType>
 		<PackageId>DotnetMigrations8</PackageId>
-		<Authors>amityagov@gmail.com</Authors>
 		<Description>Npgsql Migrations Runner
 
 run dotnet migration --help to see available options</Description>
@@ -21,7 +19,7 @@ run dotnet migration --help to see available options</Description>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
 		<PackageReference Include="Npgsql" Version="4.1.4" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8" />
 	</ItemGroup>
