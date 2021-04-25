@@ -70,7 +70,7 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 
 			if (Convert.ToInt32(command.ExecuteScalar()) == 0)
 			{
-				_logger.LogInformation($"Create \"{MigrationHistoryTableName}\" table.");
+				_logger.LogInformation("Create \"{MigrationHistoryTableName}\" table", MigrationHistoryTableName);
 
 				var createMigrationTableCommand = connection.CreateCommand();
 

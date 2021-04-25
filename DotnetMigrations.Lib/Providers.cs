@@ -2,7 +2,7 @@
 
 namespace DotnetMigrations.Lib
 {
-	public class Providers
+	public static class Providers
 	{
 		public const string Npgsql = nameof(Npgsql);
 
@@ -12,7 +12,7 @@ namespace DotnetMigrations.Lib
 
 		public const string Default = Npgsql;
 
-		public const string AllString = Npgsql + ", " + SqlServer + "," + Sqlite;
+		public const string AllString = Npgsql + ", " + SqlServer + ", " + Sqlite;
 
 		public static bool IsProviderValid(string value)
 		{

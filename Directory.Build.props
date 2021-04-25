@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>1.0.16.0</VersionPrefix>
+    <VersionPrefix>1.0.17.0</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <FileVersion>$(VersionPrefix)</FileVersion>
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
@@ -9,4 +9,8 @@
     <RepositoryType>git</RepositoryType>
     <Authors>Andrey Mityagov</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+  </ItemGroup>
 </Project>

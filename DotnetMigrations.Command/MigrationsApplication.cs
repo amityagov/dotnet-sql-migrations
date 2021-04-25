@@ -8,7 +8,7 @@ namespace DotnetMigrations.Command
 		public static CommandLineApplication<T> Create<T>(string name, Func<string> versionGetter,
 			IServiceProvider services) where T : class
 		{
-			var application = new CommandLineApplication<T>()
+			var application = new CommandLineApplication<T>
 			{
 				Name = name,
 				FullName = name,

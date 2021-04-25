@@ -38,7 +38,7 @@ namespace DotnetMigrations.Lib
 			return migrationExecutor.ExecuteAsync(options.ConnectionString, migrations, options.DryRun, cancellationToken);
 		}
 
-		private void ValidateOptions(MigrationRunnerOptions options)
+		private static void ValidateOptions(MigrationRunnerOptions options)
 		{
 			Validator.ValidateObject(options, new ValidationContext(options));
 		}

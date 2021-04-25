@@ -9,6 +9,7 @@ namespace DotnetMigrations.Lib
 		/// <summary>
 		/// <see cref="Providers.Npgsql"/>
 		/// <see cref="Providers.SqlServer"/>
+		/// <see cref="Providers.Sqlite"/>
 		/// </summary>
 		[Required]
 		public string ProviderType { get; set; } = Providers.Default;

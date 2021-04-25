@@ -56,14 +56,13 @@ namespace DotnetMigrations.Lib
 
 					var timestamp = match.Groups[1].Value;
 
-					using (var reader = new StreamReader(fileInfo.CreateReadStream()))
+					using var reader = new StreamReader(fileInfo.CreateReadStream());
+
+					yield return new MigrationInfo(timestamp, HashHelper.CalculateHash(content + "_" + timestamp))
 					{
-						yield return new MigrationInfo(timestamp, HashHelper.CalculateHash(content + "_" + timestamp))
-						{
-							Data = reader.ReadToEnd(),
-							MigrationName = fileInfo.Name
-						};
-					}
+						Data = reader.ReadToEnd(),
+						MigrationName = fileInfo.Name
+					};
 				}
 			}
 		}

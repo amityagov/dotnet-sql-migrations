@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetMigrations.Command;
 using DotnetMigrations.Lib;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -41,7 +42,7 @@ namespace DotnetMigrations8
 
 			if (!string.IsNullOrEmpty(startDelay) && int.TryParse(startDelay, out var delay))
 			{
-				logger.LogInformation($"Sleep for {delay} seconds.");
+				logger.LogInformation("Sleep for {Delay} seconds", delay);
 
 				Thread.Sleep(TimeSpan.FromSeconds(delay));
 			}
@@ -53,6 +54,12 @@ namespace DotnetMigrations8
 				try
 				{
 					code = await application.ExecuteAsync(args);
+				}
+				catch (UnrecognizedCommandParsingException e)
+				{
+					logger.LogError(e.Message, e);
+
+					return 1;
 				}
 				catch (Exception e)
 				{
@@ -72,7 +79,7 @@ namespace DotnetMigrations8
 					waitEvent.Set();
 				};
 
-				logger.LogInformation("Sleep for infinite time.");
+				logger.LogInformation("Sleep for infinite time");
 				waitEvent.Wait();
 			}
 

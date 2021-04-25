@@ -11,6 +11,8 @@ namespace DotnetMigrations.Command
 
 			builder.Services.AddSingleton<IConnectionStringsProcessor, NpgsqlConnectionStringsProcessor>();
 			builder.Services.AddSingleton<IConnectionStringsProcessor, SqlServerConnectionStringsProcessor>();
+			builder.Services.AddSingleton<IConnectionStringsProcessor, SqliteConnectionStringsProcessor>();
+
 			builder.Services.AddSingleton<MigrationOptionsLoader>();
 			builder.Services.AddSingleton<CommandMigrationRunner>();
 

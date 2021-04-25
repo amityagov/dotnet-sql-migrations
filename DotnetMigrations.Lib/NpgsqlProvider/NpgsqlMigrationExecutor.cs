@@ -28,7 +28,7 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			using (command)
 			{
 				command.CommandText = $"SELECT \"{nameof(MigrationInfo.Timestamp)}\"," +
-									  $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
+				                      $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
 
 				var reader = command.ExecuteReader();
 
@@ -54,33 +54,34 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 
 			if (Convert.ToInt32(command.ExecuteScalar()) == 0)
 			{
-				_logger.LogInformation($"Create \"{MigrationHistoryTableName}\" table.");
+				_logger.LogInformation("Create \"{MigrationHistoryTableName}\" table", MigrationHistoryTableName);
 
 				var createMigrationTableCommand = connection.CreateCommand();
 
 				using (createMigrationTableCommand)
 				{
 					createMigrationTableCommand.CommandText = $"CREATE TABLE public.\"{MigrationHistoryTableName}\"" +
-															  "(" +
-															  $"\"{nameof(MigrationInfo.Timestamp)}\" character varying(10) NOT NULL," +
-															  $"\"{nameof(MigrationInfo.MigrationName)}\" character varying(128) NOT NULL," +
-															  $"\"{nameof(MigrationInfo.Hash)}\" character varying(32) NOT NULL," +
-															  $"\"{nameof(DateApplied)}\" timestamp without time zone NOT NULL default current_timestamp," +
-															  $"CONSTRAINT \"PK_{MigrationHistoryTableName}\" PRIMARY KEY (\"Hash\")" +
-															  ");";
+					                                          "(" +
+					                                          $"\"{nameof(MigrationInfo.Timestamp)}\" character varying(10) NOT NULL," +
+					                                          $"\"{nameof(MigrationInfo.MigrationName)}\" character varying(128) NOT NULL," +
+					                                          $"\"{nameof(MigrationInfo.Hash)}\" character varying(32) NOT NULL," +
+					                                          $"\"{nameof(DateApplied)}\" timestamp without time zone NOT NULL default current_timestamp," +
+					                                          $"CONSTRAINT \"PK_{MigrationHistoryTableName}\" PRIMARY KEY (\"Hash\")" +
+					                                          ");";
 
 					createMigrationTableCommand.ExecuteNonQuery();
 				}
 			}
 		}
 
-		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo, DbConnection connection)
+		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo,
+			DbConnection connection)
 		{
 			var command = connection.CreateCommand();
 
 			command.CommandText = $"INSERT INTO public.\"{MigrationHistoryTableName}\"" +
-								  $"(\"{nameof(MigrationInfo.Timestamp)}\",\"{nameof(MigrationInfo.MigrationName)}\",\"{nameof(MigrationInfo.Hash)}\")" +
-								  $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}')";
+			                      $"(\"{nameof(MigrationInfo.Timestamp)}\",\"{nameof(MigrationInfo.MigrationName)}\",\"{nameof(MigrationInfo.Hash)}\")" +
+			                      $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}')";
 
 			return command;
 		}

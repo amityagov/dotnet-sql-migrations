@@ -72,7 +72,9 @@ namespace DotnetMigrations.Command
 			}
 			catch (Exception e)
 			{
-				_logger.LogError($"Error in migration process: {e.GetType()} - {e.Message}", e);
+				var exceptionType = e.GetType();
+				_logger.LogError(e, "Error in migration process: {ExceptionType} - {Message}", exceptionType,
+					e.Message);
 
 				return -1;
 			}
@@ -92,7 +94,7 @@ namespace DotnetMigrations.Command
 
 		private bool ValidateFiles(string directoryPath, IList<MigrationInfo> target)
 		{
-			_logger.LogInformation($"Validate migrations directory: \"{directoryPath}\".");
+			_logger.LogInformation("Validate migrations directory: \"{DirectoryPath}\"", directoryPath);
 
 			var directory = new DirectoryInfo(directoryPath);
 
@@ -117,16 +119,16 @@ namespace DotnetMigrations.Command
 			{
 				foreach (var timestamp in duplicateTimestamps)
 				{
-					_logger.LogWarning($"Duplicate timestamp: {timestamp}");
+					_logger.LogWarning("Duplicate timestamp: {Timestamp}", timestamp);
 				}
 
-				_logger.LogError("Duplicate timestamps found. Please fix. Exit.");
+				_logger.LogError("Duplicate timestamps found. Please fix. Exit");
 				return false;
 			}
 
 			if (!success)
 			{
-				_logger.LogError("Some files does not match suggested migration file pattern \"YYYYMMDDNN - migration name\". Exit.");
+				_logger.LogError("Some files does not match suggested migration file pattern \"YYYYMMDDNN - migration name\". Exit");
 			}
 
 			return success;
@@ -139,7 +141,7 @@ namespace DotnetMigrations.Command
 
 			if (match.Groups.Count < 2)
 			{
-				_logger.LogError($"File \"{fileName}\" has invalid name format.");
+				_logger.LogError("File \"{FileName}\" has invalid name format", fileName);
 				return null;
 			}
 

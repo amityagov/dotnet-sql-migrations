@@ -67,7 +67,7 @@ namespace DotnetMigrations.Lib.SqliteProvider
 
 			if (Convert.ToInt32(command.ExecuteScalar()) == 0)
 			{
-				Logger.LogInformation($"Create \"{MigrationHistoryTableName}\" table.");
+				Logger.LogInformation("Create \"{MigrationHistoryTableName}\" table", MigrationHistoryTableName);
 
 				var createMigrationTableCommand = connection.CreateCommand();
 

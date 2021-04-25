@@ -10,13 +10,15 @@ namespace DotnetMigrations.Command
 		public static string MigrationsDirectories = "MIGRATIONS_DIRECTORIES";
 		public static string ConnectionStringName = "MIGRATIONS_CONNECTIONSTRING";
 
+		public static string PrefixName = "MIGRATIONS";
+
 		public static string DatabaseName = "MIGRATIONS_DATABASE";
 		public static string UserName = "MIGRATIONS_USERNAME";
 		public static string Password = "MIGRATIONS_PASSWORD";
 		public static string Host = "MIGRATIONS_HOST";
 		public static string Port = "MIGRATIONS_PORT";
 
-		public static string[] AllKeys = {
+		public static readonly string[] AllKeys = {
 			ConnectionStringName,
 			EnvironmentName,
 			DatabaseName,

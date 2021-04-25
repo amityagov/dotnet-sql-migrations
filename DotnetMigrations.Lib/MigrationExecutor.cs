@@ -25,7 +25,7 @@ namespace DotnetMigrations.Lib
 			Logger = logger;
 		}
 
-		private DbConnection CreateConnection(string connectionString)
+		private static DbConnection CreateConnection(string connectionString)
 		{
 			var connection = new TConnection
 			{
@@ -51,61 +51,63 @@ namespace DotnetMigrations.Lib
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Error while write migration data {migrationInfo.MigrationName} - {e.Message}.");
+				Logger.LogError(e, "Error while write migration data {MigrationName} - {Message}",
+					migrationInfo.MigrationName, e.Message);
+
 				throw;
 			}
 		}
 
 		public async Task ExecuteAsync(string connectionString, ICollection<MigrationInfo> files, bool dryRun, CancellationToken cancellationToken)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled))
+			using var scope = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromMinutes(5), TransactionScopeAsyncFlowOption.Enabled);
+
+			var connection = CreateConnection(connectionString);
+
+			await using (connection)
 			{
-				var connection = CreateConnection(connectionString);
-
-				using (connection)
+				if (dryRun)
 				{
-					if (dryRun)
-					{
-						Logger.LogInformation("Start migrations. Dry run, transaction will be aborted.");
-					}
-					else
-					{
-						Logger.LogInformation("Start migrations.");
-					}
-
-					connection.Open();
-
-					EnsureMigrationHistoryTableExists(connection);
-					IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
-
-					var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
-					Logger.LogInformation($"Ready to apply {migrationsToApply.Length} migrations.");
-
-					migrationsToApply = migrationsToApply.OrderBy(x => x.Timestamp).ToArray();
-
-					try
-					{
-						foreach (var migrationInfo in migrationsToApply)
-						{
-							await ApplyMigration(migrationInfo, connection, cancellationToken);
-							WriteMigrationAppliedData(migrationInfo, connection);
-						}
-					}
-					catch (Exception)
-					{
-						Logger.LogError("Some errors occured. Rollback all changes and exit. Have a nice day.");
-						throw;
-					}
-
-					if (dryRun == false)
-					{
-						scope.Complete();
-					}
-
-					connection.Close();
-
-					Logger.LogInformation("Finish migrations.");
+					Logger.LogInformation("Start migrations. Dry run, transaction will be aborted");
 				}
+				else
+				{
+					Logger.LogInformation("Start migrations");
+				}
+
+				await connection.OpenAsync(cancellationToken);
+
+				EnsureMigrationHistoryTableExists(connection);
+				IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
+
+				var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
+				var migrationsCount = migrationsToApply.Length;
+				Logger.LogInformation("Ready to apply {MigrationsCount} migrations", migrationsCount);
+
+				migrationsToApply = migrationsToApply.OrderBy(x => x.Timestamp).ToArray();
+
+				try
+				{
+					foreach (var migrationInfo in migrationsToApply)
+					{
+						await ApplyMigration(migrationInfo, connection, cancellationToken);
+						WriteMigrationAppliedData(migrationInfo, connection);
+					}
+				}
+				catch (Exception)
+				{
+					Logger.LogError("Some errors occured. Rollback all changes and exit. Have a nice day");
+					throw;
+				}
+
+				if (dryRun == false)
+				{
+					scope.Complete();
+				}
+
+				await connection.CloseAsync();
+
+				Logger.LogInformation("Finish migrations");
 			}
 		}
 
@@ -117,17 +119,18 @@ namespace DotnetMigrations.Lib
 				var command = connection.CreateCommand();
 				command.CommandTimeout = 300;
 
-				using (command)
+				await using (command)
 				{
 					command.CommandText = migrationInfo.Data;
 					await command.ExecuteNonQueryAsync(cancellationToken);
 
-					Logger.LogInformation($"Migration {migrationInfo.MigrationName} applied.");
+					Logger.LogInformation("Migration {MigrationName} applied", migrationInfo.MigrationName);
 				}
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Error while applying {migrationInfo.MigrationName} - {e.Message}.");
+				Logger.LogError("Error while applying {MigrationName} - {ErrorMessage}", migrationInfo.MigrationName,
+					e.Message);
 				throw;
 			}
 		}

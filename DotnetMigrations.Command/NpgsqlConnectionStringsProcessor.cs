@@ -37,17 +37,19 @@ namespace DotnetMigrations.Command
 
 			if (environmentVariables.ContainsKey(EnvironmentVariables.Port))
 			{
-				if (int.TryParse(environmentVariables[EnvironmentVariables.Port], out var port))
+				var portString = environmentVariables[EnvironmentVariables.Port];
+
+				if (int.TryParse(portString, out var port))
 				{
 					builder.Port = port;
 				}
 				else
 				{
-					var errorMessage = $"Failed to parse port from environment variable, provided value: {environmentVariables[EnvironmentVariables.Port]}.";
+					_logger.LogError("Failed to parse port from environment variable, provided value: {Port}",
+						portString);
 
-					_logger.LogError(errorMessage);
-
-					throw new Exception(errorMessage);
+					throw new Exception(
+						$"Failed to parse port from environment variable, provided value: {portString}.");
 				}
 			}
 
@@ -73,7 +75,8 @@ namespace DotnetMigrations.Command
 					Password = "--HIDDEN--"
 				};
 
-				_logger.LogInformation($"Use connection string: \"{sensoredPasswordBuilder.ConnectionString}\".");
+				_logger.LogInformation("Use connection string: \"{ConnectionString}\"",
+					sensoredPasswordBuilder.ConnectionString);
 			}
 
 			return builder.ConnectionString;
