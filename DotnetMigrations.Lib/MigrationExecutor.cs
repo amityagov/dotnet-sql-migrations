@@ -81,8 +81,10 @@ namespace DotnetMigrations.Lib
 				IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
 
 				var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
-				var migrationsCount = migrationsToApply.Length;
-				Logger.LogInformation("Ready to apply {MigrationsCount} migrations", migrationsCount);
+
+				Logger.LogInformation(
+					"Ready to apply {MigrationsCount} migrations, total migrations found {TotalMigrations}",
+					migrationsToApply.Length, files.Count);
 
 				migrationsToApply = migrationsToApply.OrderBy(x => x.Timestamp).ToArray();
 
@@ -124,12 +126,12 @@ namespace DotnetMigrations.Lib
 					command.CommandText = migrationInfo.Data;
 					await command.ExecuteNonQueryAsync(cancellationToken);
 
-					Logger.LogInformation("Migration {MigrationName} applied", migrationInfo.MigrationName);
+					Logger.LogInformation("Migration \"{MigrationName}\" applied", migrationInfo.MigrationName);
 				}
 			}
 			catch (Exception e)
 			{
-				Logger.LogError("Error while applying {MigrationName} - {ErrorMessage}", migrationInfo.MigrationName,
+				Logger.LogError("Error while applying \"{MigrationName}\" - {ErrorMessage}", migrationInfo.MigrationName,
 					e.Message);
 				throw;
 			}
