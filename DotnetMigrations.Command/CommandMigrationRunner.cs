@@ -152,10 +152,7 @@ namespace DotnetMigrations.Command
 
 			var content = File.ReadAllText(fileInfo.FullName);
 
-			return new MigrationInfo(timestamp, fileName, HashHelper.CalculateHash(content + "_" + timestamp))
-			{
-				Data = content
-			};
+			return new MigrationInfo(timestamp, fileName, HashHelper.CalculateHash(content)) { Data = content };
 		}
 	}
 }

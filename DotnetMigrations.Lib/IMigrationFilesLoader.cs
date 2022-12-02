@@ -59,8 +59,10 @@ namespace DotnetMigrations.Lib
 
 					using var reader = new StreamReader(fileInfo.CreateReadStream());
 
+					var data = reader.ReadToEnd();
+
 					yield return new MigrationInfo(timestamp, fileInfo.Name,
-						HashHelper.CalculateHash(content + "_" + timestamp)) { Data = reader.ReadToEnd() };
+						HashHelper.CalculateHash(data)) { Data = data };
 				}
 			}
 		}

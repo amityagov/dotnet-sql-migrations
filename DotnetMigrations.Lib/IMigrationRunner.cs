@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetMigrations.Lib.Models;
 using Microsoft.Extensions.Options;
 
 namespace DotnetMigrations.Lib
@@ -33,7 +35,7 @@ namespace DotnetMigrations.Lib
 
 			var fileProviders = options.FileProviders;
 
-			var migrations = _migrationFilesLoader.Load(fileProviders, options.Pattern);
+			ICollection<MigrationInfo> migrations = _migrationFilesLoader.Load(fileProviders, options.Pattern);
 
 			return migrationExecutor.ExecuteAsync(options.ConnectionString, migrations, options.DryRun, cancellationToken);
 		}
