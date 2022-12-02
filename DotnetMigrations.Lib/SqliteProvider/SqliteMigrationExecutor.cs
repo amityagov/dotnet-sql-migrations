@@ -16,18 +16,19 @@ namespace DotnetMigrations.Lib.SqliteProvider
 		{
 		}
 
-		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo, DbConnection connection)
+		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo,
+			DbConnection connection)
 		{
 			var command = connection.CreateCommand();
 
 			var dateApplied = DateTime.UtcNow.ToString("o");
 
 			command.CommandText = $"INSERT INTO \"{MigrationHistoryTableName}\"" +
-								  $"(\"{nameof(MigrationInfo.Timestamp)}\"," +
-								  $"\"{nameof(MigrationInfo.MigrationName)}\"," +
-								  $"\"{nameof(MigrationInfo.Hash)}\"," +
-								  $"\"{DateApplied}\")" +
-								  $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}', '{dateApplied}')";
+			                      $"(\"{nameof(MigrationInfo.Timestamp)}\"," +
+			                      $"\"{nameof(MigrationInfo.MigrationName)}\"," +
+			                      $"\"{nameof(MigrationInfo.Hash)}\"," +
+			                      $"\"{DateApplied}\")" +
+			                      $" VALUES('{migrationInfo.Timestamp}','{migrationInfo.MigrationName}', '{migrationInfo.Hash}', '{dateApplied}')";
 
 			return command;
 		}
@@ -41,7 +42,8 @@ namespace DotnetMigrations.Lib.SqliteProvider
 			using (command)
 			{
 				command.CommandText = $"SELECT \"{nameof(MigrationInfo.Timestamp)}\"," +
-									  $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
+				                      $"\"{nameof(MigrationInfo.MigrationName)}\"," +
+				                      $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
 
 				var reader = command.ExecuteReader();
 
@@ -50,9 +52,10 @@ namespace DotnetMigrations.Lib.SqliteProvider
 					while (reader.Read())
 					{
 						var timestamp = reader.GetString(0);
-						var hash = reader.GetString(1);
+						var migrationName = reader.GetString(1);
+						var hash = reader.GetString(2);
 
-						migrations.Add(new MigrationInfo(timestamp, hash));
+						migrations.Add(new MigrationInfo(timestamp, migrationName, hash));
 					}
 				}
 			}
@@ -63,7 +66,8 @@ namespace DotnetMigrations.Lib.SqliteProvider
 		protected override void EnsureMigrationHistoryTableExists(DbConnection connection)
 		{
 			var command = connection.CreateCommand();
-			command.CommandText = $"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{MigrationHistoryTableName}';";
+			command.CommandText =
+				$"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{MigrationHistoryTableName}';";
 
 			if (Convert.ToInt32(command.ExecuteScalar()) == 0)
 			{
@@ -74,10 +78,10 @@ namespace DotnetMigrations.Lib.SqliteProvider
 				using (createMigrationTableCommand)
 				{
 					createMigrationTableCommand.CommandText = $"create table {MigrationHistoryTableName} (" +
-															  $"{nameof(MigrationInfo.Hash)} TEXT not null constraint ___MigrationHistory_pk primary key," +
-															  $"{nameof(MigrationInfo.MigrationName)} TEXT not null," +
-															  $"{nameof(MigrationInfo.Timestamp)} text," +
-															  $"{DateApplied} BLOB not null);";
+					                                          $"{nameof(MigrationInfo.Hash)} TEXT not null constraint ___MigrationHistory_pk primary key," +
+					                                          $"{nameof(MigrationInfo.MigrationName)} TEXT not null," +
+					                                          $"{nameof(MigrationInfo.Timestamp)} text," +
+					                                          $"{DateApplied} BLOB not null);";
 
 					createMigrationTableCommand.ExecuteNonQuery();
 				}

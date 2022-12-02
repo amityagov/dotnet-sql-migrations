@@ -18,19 +18,18 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 			_logger = logger;
 		}
 
-		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo, DbConnection connection)
+		protected override DbCommand GetWriteMigrationAppliedDataCommand(MigrationInfo migrationInfo,
+			DbConnection connection)
 		{
 			var command = connection.CreateCommand();
 
 			command.CommandText = $"INSERT INTO \"{MigrationHistoryTableName}\"" +
-
-								  $"(\"{nameof(MigrationInfo.Timestamp)}\"," +
-								  $"\"{nameof(MigrationInfo.MigrationName)}\"," +
-								  $"\"{nameof(MigrationInfo.Hash)}\")" +
-
-								  $" VALUES('{migrationInfo.Timestamp}'," +
-								  $"'{migrationInfo.MigrationName}'," +
-								  $"'{migrationInfo.Hash}')";
+			                      $"(\"{nameof(MigrationInfo.Timestamp)}\"," +
+			                      $"\"{nameof(MigrationInfo.MigrationName)}\"," +
+			                      $"\"{nameof(MigrationInfo.Hash)}\")" +
+			                      $" VALUES('{migrationInfo.Timestamp}'," +
+			                      $"'{migrationInfo.MigrationName}'," +
+			                      $"'{migrationInfo.Hash}')";
 
 			return command;
 		}
@@ -44,7 +43,8 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 			using (command)
 			{
 				command.CommandText = $"SELECT {nameof(MigrationInfo.Timestamp)}," +
-									  $" {nameof(MigrationInfo.Hash)} FROM {MigrationHistoryTableName};";
+				                      $"\"{nameof(MigrationInfo.MigrationName)}\"," +
+				                      $" {nameof(MigrationInfo.Hash)} FROM {MigrationHistoryTableName};";
 
 				var reader = command.ExecuteReader();
 
@@ -53,9 +53,10 @@ namespace DotnetMigrations.Lib.SqlServerProvider
 					while (reader.Read())
 					{
 						var timestamp = reader.GetString(0);
-						var hash = reader.GetString(1);
+						var migrationName = reader.GetString(2);
+						var hash = reader.GetString(2);
 
-						migrations.Add(new MigrationInfo(timestamp, hash));
+						migrations.Add(new MigrationInfo(timestamp, migrationName, hash));
 					}
 				}
 			}

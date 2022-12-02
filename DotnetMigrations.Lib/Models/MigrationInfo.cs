@@ -10,33 +10,46 @@ namespace DotnetMigrations.Lib.Models
 
 		public string Data { get; set; }
 
-		public string MigrationName { get; set; }
+		public string MigrationName { get; }
 
-		public MigrationInfo(string timestamp, string hash)
+		public MigrationInfo(string timestamp, string migrationName, string hash)
 		{
 			Timestamp = timestamp;
+			MigrationName = migrationName;
 			Hash = hash;
 		}
 
-		protected bool Equals(MigrationInfo other)
+		private bool Equals(MigrationInfo other)
 		{
-			return string.Equals(Timestamp, other.Timestamp);
+			return MigrationName == other.MigrationName;
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
+			if (ReferenceEquals(null, obj))
+			{
+				return false;
+			}
+
+			if (ReferenceEquals(this, obj))
+			{
+				return true;
+			}
+
+			if (obj.GetType() != this.GetType())
+			{
+				return false;
+			}
+
 			return Equals((MigrationInfo)obj);
 		}
 
 		public override int GetHashCode()
 		{
-			return (Timestamp != null ? Timestamp.GetHashCode() : 0);
+			return (MigrationName != null ? MigrationName.GetHashCode() : 0);
 		}
 
-		private sealed class TimestampEqualityComparer : IEqualityComparer<MigrationInfo>
+		private sealed class MigrationNameEqualityComparer : IEqualityComparer<MigrationInfo>
 		{
 			public bool Equals(MigrationInfo x, MigrationInfo y)
 			{
@@ -60,15 +73,16 @@ namespace DotnetMigrations.Lib.Models
 					return false;
 				}
 
-				return x.Timestamp == y.Timestamp;
+				return x.MigrationName == y.MigrationName;
 			}
 
 			public int GetHashCode(MigrationInfo obj)
 			{
-				return (obj.Timestamp != null ? obj.Timestamp.GetHashCode() : 0);
+				return (obj.MigrationName != null ? obj.MigrationName.GetHashCode() : 0);
 			}
 		}
 
-		public static IEqualityComparer<MigrationInfo> TimestampComparer { get; } = new TimestampEqualityComparer();
+		public static IEqualityComparer<MigrationInfo> MigrationNameComparer { get; } =
+			new MigrationNameEqualityComparer();
 	}
 }

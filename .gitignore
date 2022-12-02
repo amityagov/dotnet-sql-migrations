@@ -5,3 +5,5 @@ out
 *.user
 *.nupkg
 nupkg
+
+.idea/

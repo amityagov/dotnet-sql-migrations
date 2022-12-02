@@ -20,7 +20,8 @@ namespace DotnetMigrations.Command
 
 		public const string Pattern = "*.sql";
 
-		private readonly Regex _filePattern = new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private readonly Regex _filePattern =
+			new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		public CommandMigrationRunner(ILogger<CommandMigrationRunner> logger, IProviderCollection providerCollection,
 			MigrationOptionsLoader migrationOptionsLoader)
@@ -45,13 +46,13 @@ namespace DotnetMigrations.Command
 			try
 			{
 				if (_migrationOptionsLoader.TryGetOptions(configFilePath,
-					connectionString,
-					migrationsDirectory,
-					connectionStringName,
-					environmentName,
-					environmentVariables,
-					provider,
-					out var options))
+					    connectionString,
+					    migrationsDirectory,
+					    connectionStringName,
+					    environmentName,
+					    environmentVariables,
+					    provider,
+					    out var options))
 				{
 					var files = new List<MigrationInfo>();
 
@@ -113,7 +114,8 @@ namespace DotnetMigrations.Command
 				target.Add(info);
 			}
 
-			var duplicateTimestamps = target.GroupBy(x => x.Timestamp).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
+			var duplicateTimestamps =
+				target.GroupBy(x => x.Timestamp).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
 
 			if (duplicateTimestamps.Any())
 			{
@@ -128,7 +130,8 @@ namespace DotnetMigrations.Command
 
 			if (!success)
 			{
-				_logger.LogError("Some files does not match suggested migration file pattern \"YYYYMMDDNN - migration name\". Exit");
+				_logger.LogError(
+					"Some files does not match suggested migration file pattern \"YYYYMMDDNN - migration name\". Exit");
 			}
 
 			return success;
@@ -149,10 +152,9 @@ namespace DotnetMigrations.Command
 
 			var content = File.ReadAllText(fileInfo.FullName);
 
-			return new MigrationInfo(timestamp, HashHelper.CalculateHash(content + "_" + timestamp))
+			return new MigrationInfo(timestamp, fileName, HashHelper.CalculateHash(content + "_" + timestamp))
 			{
-				Data = content,
-				MigrationName = fileName
+				Data = content
 			};
 		}
 	}

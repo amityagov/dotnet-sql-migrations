@@ -8,19 +8,10 @@ namespace DotnetMigrations.Lib.Tests
 		[Fact]
 		public void AssertEqual()
 		{
-			var one = new MigrationInfo("timestamp", "hash");
-			var two = new MigrationInfo("timestamp", "hash");
+			var one = new MigrationInfo("timestamp", "test", "hash");
+			var two = new MigrationInfo("timestamp", "test", "hash");
 
 			Assert.Equal(one, two);
-		}
-
-		[Fact]
-		public void AssertEqualWithComparer()
-		{
-			var one = new MigrationInfo("timestamp", "hash");
-			var two = new MigrationInfo("timestamp", "hash");
-
-			Assert.True(MigrationInfo.TimestampComparer.Equals(one, two));
 		}
 	}
 }

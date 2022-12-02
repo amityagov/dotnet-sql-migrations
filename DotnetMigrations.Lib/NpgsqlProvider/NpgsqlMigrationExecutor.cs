@@ -28,7 +28,9 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 			using (command)
 			{
 				command.CommandText = $"SELECT \"{nameof(MigrationInfo.Timestamp)}\"," +
-				                      $" \"{nameof(MigrationInfo.Hash)}\" FROM \"{MigrationHistoryTableName}\";";
+				                      $" \"{nameof(MigrationInfo.MigrationName)}\"," +
+				                      $" \"{nameof(MigrationInfo.Hash)}\"" +
+				                      $" FROM \"{MigrationHistoryTableName}\";";
 
 				var reader = command.ExecuteReader();
 
@@ -37,9 +39,10 @@ namespace DotnetMigrations.Lib.NpgsqlProvider
 					while (reader.Read())
 					{
 						var timestamp = reader.GetString(0);
-						var hash = reader.GetString(1);
+						var migrationName = reader.GetString(1);
+						var hash = reader.GetString(2);
 
-						migrations.Add(new MigrationInfo(timestamp, hash));
+						migrations.Add(new MigrationInfo(timestamp, migrationName, hash));
 					}
 				}
 			}

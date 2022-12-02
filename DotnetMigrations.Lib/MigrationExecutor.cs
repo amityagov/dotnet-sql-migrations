@@ -80,7 +80,7 @@ namespace DotnetMigrations.Lib
 				EnsureMigrationHistoryTableExists(connection);
 				IEnumerable<MigrationInfo> appliedMigrations = GetCurrentAppliedMigrations(connection);
 
-				var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.TimestampComparer).ToArray();
+				var migrationsToApply = files.Except(appliedMigrations, MigrationInfo.MigrationNameComparer).ToArray();
 
 				Logger.LogInformation(
 					"Ready to apply {MigrationsCount} migrations, total migrations found {TotalMigrations}",

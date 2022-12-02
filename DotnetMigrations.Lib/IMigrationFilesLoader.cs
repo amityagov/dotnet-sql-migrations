@@ -16,7 +16,8 @@ namespace DotnetMigrations.Lib
 
 	public class MigrationFilesLoader : IMigrationFilesLoader
 	{
-		private readonly Regex _filePattern = new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private readonly Regex _filePattern =
+			new Regex(@"^(\d{10})\s*-\s*.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		public ICollection<MigrationInfo> Load(ICollection<IFileProvider> fileProviders, string pattern)
 		{
@@ -58,11 +59,8 @@ namespace DotnetMigrations.Lib
 
 					using var reader = new StreamReader(fileInfo.CreateReadStream());
 
-					yield return new MigrationInfo(timestamp, HashHelper.CalculateHash(content + "_" + timestamp))
-					{
-						Data = reader.ReadToEnd(),
-						MigrationName = fileInfo.Name
-					};
+					yield return new MigrationInfo(timestamp, fileInfo.Name,
+						HashHelper.CalculateHash(content + "_" + timestamp)) { Data = reader.ReadToEnd() };
 				}
 			}
 		}
