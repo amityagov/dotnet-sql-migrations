@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<AssemblyName>DotnetMigrations8.Command</AssemblyName>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>DotnetMigrations8.Command</AssemblyName>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0"/>
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj"/>
+  </ItemGroup>
 </Project>

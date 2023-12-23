@@ -1,31 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<AssemblyName>DotnetMigrations8</AssemblyName>
-		<OutputType>Exe</OutputType>
-		<PackageId>DotnetMigrations8</PackageId>
-		<Description>Npgsql Migrations Runner
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>DotnetMigrations8</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>DotnetMigrations8</PackageId>
+    <Description>Npgsql Migrations Runner
 
-run dotnet migration --help to see available options</Description>
-		<RootNamespace>DotnetMigrations8</RootNamespace>
-		<PackAsTool>true</PackAsTool>
-		<ToolCommandName>dotnet-migration</ToolCommandName>
-		<PackageOutputPath>./nupkg</PackageOutputPath>
-	</PropertyGroup>
+      run dotnet migration --help to see available options
+    </Description>
+    <RootNamespace>DotnetMigrations8</RootNamespace>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-migration</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
-		<PackageReference Include="Npgsql" Version="4.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0"/>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8"/>
+    <PackageReference Include="Npgsql" Version="4.1.4"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8"/>
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj" />
-		<ProjectReference Include="..\DotnetMigrations.Command\DotnetMigrations.Command.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetMigrations.Lib\DotnetMigrations.Lib.csproj"/>
+    <ProjectReference Include="..\DotnetMigrations.Command\DotnetMigrations.Command.csproj"/>
+  </ItemGroup>
 </Project>
