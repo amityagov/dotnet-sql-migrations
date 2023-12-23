@@ -55,14 +55,17 @@ namespace DotnetMigrations.Lib
 						throw new InvalidOperationException($"File \"{fileInfo.Name}\" has invalid name format.");
 					}
 
-					var timestamp = match.Groups[1].Value;
+					string timestamp = match.Groups[1].Value;
 
 					using var reader = new StreamReader(fileInfo.CreateReadStream());
 
 					var data = reader.ReadToEnd();
 
 					yield return new MigrationInfo(timestamp, fileInfo.Name,
-						HashHelper.CalculateHash(data)) { Data = data };
+						HashHelper.CalculateHash(data, timestamp))
+					{
+						Data = data
+					};
 				}
 			}
 		}

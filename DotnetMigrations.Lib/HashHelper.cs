@@ -5,10 +5,10 @@ namespace DotnetMigrations.Lib
 {
 	public static class HashHelper
 	{
-		public static string CalculateHash(string data)
+		public static string CalculateHash(string data, string timestamp)
 		{
 			var md5 = MD5.Create();
-			var bytes = Encoding.UTF8.GetBytes(data);
+			var bytes = Encoding.UTF8.GetBytes(data + timestamp);
 
 			var hash = md5.ComputeHash(bytes, 0, bytes.Length);
 

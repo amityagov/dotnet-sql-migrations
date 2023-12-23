@@ -2,10 +2,10 @@
 
 namespace DotnetMigrations.Command
 {
-	public interface IConnectionStringsProcessor
-	{
-		string ProcessConnectionString(string connectionString, IDictionary<string, string> environmentVariables);
+    public interface IConnectionStringsProcessor
+    {
+        string ProcessConnectionString(string connectionString, IDictionary<string, string> environmentVariables);
 
-		string Type { get; }
-	}
+        string Type { get; }
+    }
 }

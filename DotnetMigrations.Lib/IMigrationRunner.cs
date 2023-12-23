@@ -7,42 +7,43 @@ using Microsoft.Extensions.Options;
 
 namespace DotnetMigrations.Lib
 {
-	public interface IMigrationRunner
-	{
-		Task ExecuteAsync(CancellationToken cancellationToken);
-	}
+    public interface IMigrationRunner
+    {
+        Task ExecuteAsync(CancellationToken cancellationToken);
+    }
 
-	public class MigrationRunner : IMigrationRunner
-	{
-		private readonly IOptions<MigrationRunnerOptions> _options;
-		private readonly IProviderCollection _providerCollection;
-		private readonly IMigrationFilesLoader _migrationFilesLoader;
+    public class MigrationRunner : IMigrationRunner
+    {
+        private readonly IOptions<MigrationRunnerOptions> _options;
+        private readonly IProviderCollection _providerCollection;
+        private readonly IMigrationFilesLoader _migrationFilesLoader;
 
-		public MigrationRunner(IOptions<MigrationRunnerOptions> options,
-			IProviderCollection providerCollection, IMigrationFilesLoader migrationFilesLoader)
-		{
-			_options = options;
-			_providerCollection = providerCollection;
-			_migrationFilesLoader = migrationFilesLoader;
-		}
+        public MigrationRunner(IOptions<MigrationRunnerOptions> options,
+            IProviderCollection providerCollection, IMigrationFilesLoader migrationFilesLoader)
+        {
+            _options = options;
+            _providerCollection = providerCollection;
+            _migrationFilesLoader = migrationFilesLoader;
+        }
 
-		public Task ExecuteAsync(CancellationToken cancellationToken)
-		{
-			var options = _options.Value;
-			ValidateOptions(options);
+        public Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            var options = _options.Value;
+            ValidateOptions(options);
 
-			var migrationExecutor = _providerCollection.GetMigrationExecutor(options.ProviderType);
+            var migrationExecutor = _providerCollection.GetMigrationExecutor(options.ProviderType);
 
-			var fileProviders = options.FileProviders;
+            var fileProviders = options.FileProviders;
 
-			ICollection<MigrationInfo> migrations = _migrationFilesLoader.Load(fileProviders, options.Pattern);
+            ICollection<MigrationInfo> migrations = _migrationFilesLoader.Load(fileProviders, options.Pattern);
 
-			return migrationExecutor.ExecuteAsync(options.ConnectionString, migrations, options.DryRun, cancellationToken);
-		}
+            return migrationExecutor.ExecuteAsync(options.ConnectionString, migrations, options.DryRun,
+                cancellationToken);
+        }
 
-		private static void ValidateOptions(MigrationRunnerOptions options)
-		{
-			Validator.ValidateObject(options, new ValidationContext(options));
-		}
-	}
+        private static void ValidateOptions(MigrationRunnerOptions options)
+        {
+            Validator.ValidateObject(options, new ValidationContext(options));
+        }
+    }
 }

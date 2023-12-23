@@ -4,25 +4,25 @@ using Microsoft.Extensions.FileProviders;
 
 namespace DotnetMigrations.Lib
 {
-	public class MigrationRunnerOptions
-	{
-		/// <summary>
-		/// <see cref="Providers.Npgsql"/>
-		/// <see cref="Providers.SqlServer"/>
-		/// <see cref="Providers.Sqlite"/>
-		/// </summary>
-		[Required]
-		public string ProviderType { get; set; } = Providers.Default;
+    public class MigrationRunnerOptions
+    {
+        /// <summary>
+        /// <see cref="Providers.Npgsql"/>
+        /// <see cref="Providers.SqlServer"/>
+        /// <see cref="Providers.Sqlite"/>
+        /// </summary>
+        [Required]
+        public string ProviderType { get; set; } = Providers.Default;
 
-		[Required]
-		public string ConnectionString { get; set; }
+        [Required]
+        public string ConnectionString { get; set; }
 
-		public bool DryRun { get; set; }
+        public bool DryRun { get; set; }
 
-		[Required]
-		public ICollection<IFileProvider> FileProviders { get; set; }
+        [Required]
+        public ICollection<IFileProvider> FileProviders { get; set; }
 
-		[Required]
-		public string Pattern { get; set; } = "*.sql";
-	}
+        [Required]
+        public string Pattern { get; set; } = "*.sql";
+    }
 }
