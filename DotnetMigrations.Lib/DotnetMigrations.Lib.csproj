@@ -5,15 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0"/>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2"/>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.8"/>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8"/>
-    <PackageReference Include="Npgsql" Version="4.1.4"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8"/>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8"/>
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.1.8"/>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Npgsql" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="8.0.0" />
   </ItemGroup>
 </Project>

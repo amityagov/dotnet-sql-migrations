@@ -5,6 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Arity.Abstractions" Version="0.0.9" />
+    <PackageReference Include="Arity.Abstractions" Version="1.0.2" />
   </ItemGroup>
 </Project>
